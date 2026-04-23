@@ -28,10 +28,10 @@
                     </button>
                     <div class="absolute left-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="py-2">
-                            <a href="/profile/sejarah" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Sejarah</a>
+                            <a href="{{ url('/profile/sejarah') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Sejarah</a>
                         </div>
                         <div class="py-2">
-                            <a href="/profile/struktur" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Struktur Organisasi</a>
+                            <a href="{{ url('/profile/struktur') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Struktur Organisasi</a>
                         </div>
                     </div>
                 </div>
@@ -42,9 +42,9 @@
                     </button>
                     <div class="absolute left-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="py-2">
-                            <a href="/kegiatan/agenda" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Agenda Masjid</a>
-                            <a href="/kegiatan/kajian" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Kajian</a>
-                            <a href="/kegiatan/pendidikan" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Pendidikan</a>
+                            <a href="{{ url('/kegiatan/agenda') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Agenda Masjid</a>
+                            <a href="{{ url('/kegiatan/kajian') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Kajian</a>
+                            <a href="{{ url('/kegiatan/pendidikan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Pendidikan</a>
                         </div>
                     </div>
                 </div>
@@ -55,8 +55,8 @@
                     </button>
                     <div class="absolute left-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="py-2">
-                            <a href="/reservasi/gedung" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Gedung</a>
-                            <a href="/reservasi/lapangan" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Lapangan</a>
+                            <a href="{{ url('/reservasi/gedung') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Gedung</a>
+                            <a href="{{ url('/reservasi/lapangan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Lapangan</a>
                         </div>
                     </div>
                 </div>
@@ -67,10 +67,10 @@
                     </button>
                     <div class="absolute left-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="py-2">
-                            <a href="/infaq/pencatatan" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Catatan Pendapatan</a>
-                            <a href="/infaq/infaq" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Infaq</a>
-                            <a href="/infaq/zakat" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Zakat</a>
-                            <a href="/infaq/donasi" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Donasi</a>
+                            <a href="{{ url('/infaq/pencatatan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Catatan Pendapatan</a>
+                            <a href="{{ url('/infaq/infaq') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Infaq</a>
+                            <a href="{{ url('/infaq/zakat') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Zakat</a>
+                            <a href="{{ url('/infaq/donasi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Donasi</a>
                         </div>
                     </div>
                 </div>
@@ -85,11 +85,38 @@
 
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-inner">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="/profile" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-md">Profile</a>
-            <a href="/kegiatan" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-md">Kegiatan</a>
-            <a href="/reservasi" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-md">Reservasi</a>
-            <a href="/infaq" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-md">Infaq</a>
-            <a href="/login" class="block px-3 py-2 text-base font-medium text-green-600 font-bold hover:bg-gray-50 rounded-md">Login</a>
+            
+            <div class="block px-3 py-2 text-base font-medium text-gray-800">Profile</div>
+            <div class="pl-5 space-y-1">
+                <a href="{{ url('/profile/sejarah') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Sejarah</a>
+                <a href="{{ url('/profile/struktur') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Struktur Organisasi</a>
+            </div>
+
+            <div class="block px-3 py-2 mt-2 text-base font-medium text-gray-800 border-t border-gray-100 pt-2">Kegiatan</div>
+            <div class="pl-5 space-y-1">
+                <a href="{{ url('/kegiatan/agenda') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Agenda Masjid</a>
+                <a href="{{ url('/kegiatan/kajian') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Kajian</a>
+                <a href="{{ url('/kegiatan/pendidikan') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Pendidikan</a>
+            </div>
+
+            <div class="block px-3 py-2 mt-2 text-base font-medium text-gray-800 border-t border-gray-100 pt-2">Reservasi</div>
+            <div class="pl-5 space-y-1">
+                <a href="{{ url('/reservasi/wedding') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Gedung Pernikahan</a>
+                <a href="{{ url('/reservasi/socialevent') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Gedung Event</a>
+            </div>
+
+            <div class="block px-3 py-2 mt-2 text-base font-medium text-gray-800 border-t border-gray-100 pt-2">ZIS</div>
+            <div class="pl-5 space-y-1">
+                <a href="{{ url('/infaq/pencatatan') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Catatan Keuangan Masjid</a>
+                <a href="{{ url('/infaq/zakat') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Zakat</a>
+                <a href="{{ url('/infaq/infaq') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Infaq</a>
+                <a href="{{ url('/infaq/sedekah') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">sedekah</a>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <a href="{{ route('login') }}" class="block px-3 py-2 text-base font-bold text-green-600 hover:bg-green-50 rounded-md text-center border border-green-600 mx-3">Login</a>
+            </div>
+
         </div>
     </div>
 </header>
