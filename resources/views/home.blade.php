@@ -38,77 +38,56 @@
     <main class="max-w-7xl mx-auto px-4 py-16">
         
         <div class="mb-8 border-b-2 border-gray-200 pb-2 flex items-center justify-between">
-            <h3 class="text-2xl font-bold text-blue-800 uppercase tracking-wider border-l-4 border-blue-800 pl-3">
+            <h3 class="text-2xl font-bold text-green-800 uppercase tracking-wider border-l-4 border-green-800 pl-3">
                 Berita Terbaru
             </h3>
         </div>
 
         @if($news->isEmpty())
             <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+                <i class="fa-solid fa-newspaper text-5xl text-gray-200 mb-4 block"></i>
                 <p class="text-gray-500 text-lg">Belum ada berita terbaru saat ini.</p>
             </div>
         @else
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 
-                @php $beritaUtama = $news->first(); @endphp
-                <div class="lg:col-span-2 relative group overflow-hidden bg-gray-200 aspect-video lg:aspect-auto h-[300px] lg:h-auto rounded-l-lg">
-                    <img src="{{ $beritaUtama->FOTO_NEWS ? asset('storage/' . $beritaUtama->FOTO_NEWS) : asset('images/default-news.jpg') }}" alt="Berita Utama" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                @foreach($news->take(10) as $item)
+                <article class="flex flex-col sm:flex-row gap-4 border-b border-gray-100 pb-4 group">
+                    <div class="w-full sm:w-2/5 h-48 sm:h-36 overflow-hidden rounded-md flex-shrink-0 relative">
+                        <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/400x300/e2e8f0/64748b?text=Masjid+Agung' }}" 
+                             alt="{{ $item->judul }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-2 left-2">
+                            <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">
+                                {{ $item->kategori }}
+                            </span>
+                        </div>
+                    </div>
                     
-                    <a href="{{ url('/berita/'.$beritaUtama->id) }}" class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></a>
-                    
-                    <div class="absolute bottom-0 left-0 p-6 w-full lg:w-[85%]">
-                        <span class="bg-blue-700 text-white text-xs font-bold px-3 py-1 uppercase rounded-sm">Update</span>
-                        <a href="{{ url('/berita/'.$beritaUtama->id) }}">
-                            <h4 class="text-2xl md:text-3xl font-bold text-white mt-3 mb-2 leading-tight hover:text-blue-300 transition-colors line-clamp-2 shadow-sm">
-                                {{ $beritaUtama->JUDUL_NEWS }}
+                    <div class="w-full sm:w-3/5 flex flex-col justify-center">
+                        <a href="{{ route('berita.show', $item->id) }}">
+                            <h4 class="text-lg font-bold text-gray-800 leading-snug hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+                                {{ $item->judul }}
                             </h4>
                         </a>
-                        <p class="text-sm text-gray-300 line-clamp-2 mt-2 hidden md:block">
-                            {{ Str::limit(strip_tags($beritaUtama->ISI_NEWS), 120) }}
+                        <div class="flex items-center text-xs text-gray-500 mb-2 gap-3">
+                            <span><i class="fa-solid fa-user-pen mr-1"></i> Admin MAS</span>
+                            <span><i class="fa-regular fa-clock mr-1"></i> {{ $item->created_at->format('d/m/Y') }}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 line-clamp-2">
+                            {{ Str::limit(strip_tags($item->isi_konten), 90) }}
                         </p>
                     </div>
-                </div>
+                </article>
+                @endforeach
 
-                <div class="flex flex-col gap-2 h-full">
-                    @foreach($news as $index => $item)
-                        @if($index > 0 && $index <= 3)
-                            <div class="relative group overflow-hidden bg-gray-200 flex-1 min-h-[120px] lg:min-h-[150px] {{ $index == 3 ? 'rounded-br-lg' : ($index == 1 ? 'rounded-tr-lg' : '') }}">
-                                <img src="{{ $item->FOTO_NEWS ? asset('storage/' . $item->FOTO_NEWS) : asset('images/default-news.jpg') }}" alt="Berita" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                                <a href="{{ url('/berita/'.$item->id) }}" class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></a>
-                                <div class="absolute bottom-0 left-0 p-4 w-full">
-                                    <a href="{{ url('/berita/'.$item->id) }}">
-                                        <h4 class="text-sm md:text-base font-bold text-white leading-snug hover:text-blue-300 transition-colors line-clamp-2">
-                                            {{ $item->JUDUL_NEWS }}
-                                        </h4>
-                                    </a>
-                                </div>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
             </div>
 
-            @if(count($news) > 4)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-                    @foreach($news as $index => $item)
-                        @if($index > 3)
-                            <article class="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md border border-gray-100 transition-shadow">
-                                <div class="w-1/3 flex-shrink-0 h-24 overflow-hidden rounded-md">
-                                    <img src="{{ $item->FOTO_NEWS ? asset('storage/' . $item->FOTO_NEWS) : asset('images/default-news.jpg') }}" alt="{{ $item->JUDUL_NEWS }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
-                                </div>
-                                <div class="w-2/3 flex flex-col justify-center">
-                                    <a href="{{ url('/berita/'.$item->id) }}">
-                                        <h4 class="font-bold text-sm text-gray-800 hover:text-blue-700 transition-colors line-clamp-2 mb-1">
-                                            {{ $item->JUDUL_NEWS }}
-                                        </h4>
-                                    </a>
-                                    <p class="text-xs text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($item->ISI_NEWS), 60) }}</p>
-                                </div>
-                            </article>
-                        @endif
-                    @endforeach
-                </div>
-            @endif
+            <div class="mt-10 flex justify-center">
+                <a href="{{ url('/kegiatan/semuaBerita') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded transition shadow-md">
+                    BERITA LAINNYA
+                </a>
+            </div>
         @endif
     </main>
 
@@ -141,5 +120,10 @@
             }, 5000); 
         });
     </script>
+    @if(session('welcome'))
+        <script>
+            alert("{{ session('welcome') }}");
+        </script>
+    @endif
 </body>
 </html>

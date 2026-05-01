@@ -62,7 +62,7 @@
                 </div>
             </form>
 
-            <form action="{{ route('register') }}" method="POST" id="signUpForm" class="w-full flex flex-col items-center text-center hidden-form transition-all duration-300 absolute px-8 md:px-12">
+            <form action="{{ route('register') }}" method="POST" id="signUpForm" class="w-full flex flex-col items-center text-center hidden-form transition-all duration-300">
                 @csrf
                 <h1 class="text-3xl font-bold mb-2 text-green-700">Buat Akun</h1>
 
@@ -126,6 +126,23 @@
             </div>
         </div>
     </div>
+    
+    @if(session('cek_email'))
+    <div id="emailModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 transition-all duration-300">
+        <div class="bg-white p-8 rounded-[24px] shadow-2xl max-w-sm w-full text-center transform transition-all scale-100">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Cek Email Anda</h2>
+            <p class="text-gray-600 text-sm mb-6 leading-relaxed">
+                {{ session('cek_email') }}
+            </p>
+            <button onclick="document.getElementById('emailModal').remove()" class="w-full bg-green-700 text-white hover:bg-green-800 rounded-full py-3.5 font-bold text-sm shadow-md transition-colors active:scale-95">
+                Siap, Paham!
+            </button>
+        </div>
+    </div>
+    @endif
 
     <script>
         const signInForm = document.getElementById('signInForm');

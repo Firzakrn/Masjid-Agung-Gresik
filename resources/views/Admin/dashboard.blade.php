@@ -18,7 +18,9 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
+    
     @include('Admin.navbarAdm')
+    
     <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
         
         <header class="md:hidden bg-green-900 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -34,18 +36,21 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 font-medium mb-1">Total Pengunjung Web</p>
-                        <h3 class="text-4xl font-bold text-gray-800">12,450</h3>
-                        <p class="text-xs text-green-600 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> +14% bulan ini</p>
+                        <h3 class="text-4xl font-bold text-gray-800">1,254</h3>
+                        <p class="text-xs text-green-600 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> +14% bulan ini (Dummy)</p>
                     </div>
                     <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
                         <i class="fa-solid fa-eye"></i>
                     </div>
                 </div>
+
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 font-medium mb-1">Jamaah Terdaftar (Login)</p>
-                        <h3 class="text-4xl font-bold text-gray-800">842</h3>
-                        <p class="text-xs text-green-600 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> +5 jamaah baru hari ini</p>
+                        <h3 class="text-4xl font-bold text-gray-800">{{ $totalJamaah ?? 0 }}</h3>
+                        <p class="text-xs text-green-600 mt-2">
+                            <i class="fa-solid fa-arrow-trend-up"></i> +{{ $jamaahBaruBulanIni ?? 0 }} jamaah baru bulan ini
+                        </p>
                     </div>
                     <div class="w-16 h-16 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-2xl">
                         <i class="fa-solid fa-users"></i>
@@ -68,29 +73,47 @@
 
             <div class="mb-8">
                 <div class="flex justify-between items-end mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">7 Berita Terbaru</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Publikasi Terbaru</h3>
                     <a href="{{ route('admin.berita') }}" class="text-sm text-green-600 hover:underline">Lihat Semua</a>
                 </div>
                 
                 <div class="flex overflow-x-auto hide-scroll-bar gap-4 pb-4 snap-x">
-                    @for ($i = 1; $i <= 7; $i++)
-                    <div class="min-w-[280px] w-[280px] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden snap-center flex-shrink-0 group cursor-pointer">
-                        <div class="h-32 bg-gray-200 relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Berita">
+                    @if(isset($beritaTerbaru) && $beritaTerbaru->count() > 0)
+                        @foreach($beritaTerbaru as $berita)
+                        <div class="min-w-[280px] w-[280px] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden snap-center flex-shrink-0 group cursor-pointer">
+                            <div class="h-32 bg-gray-200 relative overflow-hidden">
+                                @if($berita->foto)
+                                    <img src="{{ asset('images/berita/' . $berita->foto) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $berita->judul }}">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-green-100 text-green-500">
+                                        <i class="fa-solid fa-mosque text-3xl"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-4">
+                                <span class="text-[10px] font-bold text-white {{ $berita->kategori == 'berita' ? 'bg-blue-600' : 'bg-purple-600' }} px-2 py-1 rounded uppercase tracking-wider">
+                                    {{ $berita->kategori }}
+                                </span>
+                                <h4 class="font-bold text-gray-800 mt-2 line-clamp-2 leading-tight group-hover:text-green-700 transition">
+                                    {{ $berita->judul }}
+                                </h4>
+                                <p class="text-xs text-gray-400 mt-3">
+                                    <i class="fa-regular fa-clock"></i> Diperbarui {{ $berita->updated_at->diffForHumans() }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="p-4">
-                            <span class="text-[10px] font-bold text-white bg-green-600 px-2 py-1 rounded uppercase tracking-wider">Kabar Masjid</span>
-                            <h4 class="font-bold text-gray-800 mt-2 line-clamp-2 leading-tight group-hover:text-green-700 transition">Persiapan Menyambut Bulan Suci Ramadhan di Masjid Agung</h4>
-                            <p class="text-xs text-gray-400 mt-3"><i class="fa-regular fa-clock"></i> 2 Jam yang lalu</p>
+                        @endforeach
+                    @else
+                        <div class="w-full text-center py-10 bg-white rounded-xl border border-dashed border-gray-300">
+                            <p class="text-gray-500 text-sm">Belum ada publikasi berita atau kegiatan.</p>
                         </div>
-                    </div>
-                    @endfor
+                    @endif
                 </div>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
                 <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h3 class="text-lg font-bold text-gray-800">10 Aktivitas Pencatatan Terakhir</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Aktivitas Pencatatan Terakhir</h3>
                     <a href="#" class="text-sm text-green-600 hover:underline">Kelola Data</a>
                 </div>
                 <div class="overflow-x-auto">
@@ -100,32 +123,35 @@
                                 <th class="px-6 py-4 font-bold">Waktu</th>
                                 <th class="px-6 py-4 font-bold">Jenis Pencatatan</th>
                                 <th class="px-6 py-4 font-bold">Keterangan</th>
-                                <th class="px-6 py-4 font-bold">Admin</th>
+                                <th class="px-6 py-4 font-bold">Tipe User</th>
                                 <th class="px-6 py-4 font-bold text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @for ($i = 1; $i <= 10; $i++)
                             <tr class="hover:bg-green-50/50 transition">
-                                <td class="px-6 py-4 whitespace-nowrap">Hari ini, 10:{{ sprintf('%02d', $i * 5) }} WIB</td>
-                                <td class="px-6 py-4 font-semibold text-gray-800">
-                                    @if($i % 2 == 0) Infaq QRIS @else Zakat Maal @endif
-                                </td>
-                                <td class="px-6 py-4 truncate max-w-xs">
-                                    Masuk dana sebesar Rp {{ number_format($i * 150000, 0, ',', '.') }} dari Hamba Allah
-                                </td>
-                                <td class="px-6 py-4">Admin Utama</td>
+                                <td class="px-6 py-4 whitespace-nowrap">Hari ini, 10:45 WIB</td>
+                                <td class="px-6 py-4 font-semibold text-gray-800">Infaq QRIS</td>
+                                <td class="px-6 py-4 truncate max-w-xs">Masuk dana sebesar Rp 150.000 (Dummy Data)</td>
+                                <td class="px-6 py-4">Hamba Allah</td>
                                 <td class="px-6 py-4 text-right">
                                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Berhasil</span>
                                 </td>
                             </tr>
-                            @endfor
+                            <tr class="hover:bg-green-50/50 transition">
+                                <td class="px-6 py-4 whitespace-nowrap">Hari ini, 09:12 WIB</td>
+                                <td class="px-6 py-4 font-semibold text-gray-800">DP Reservasi</td>
+                                <td class="px-6 py-4 truncate max-w-xs">Masuk dana sebesar Rp 1.000.000 untuk Intimate Wedding</td>
+                                <td class="px-6 py-4">Jamaah Terdaftar</td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Pending</span>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-        </div> </main>
-
+        </div> 
+    </main>
 </body>
 </html>

@@ -22,6 +22,22 @@
         </header>
 
         <div class="flex-1 overflow-y-auto relative" id="scrollArea">
+
+            @if(session('success'))
+            <div class="max-w-6xl mx-auto mt-6 px-6 md:px-10">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <span class="block sm:inline font-bold"><i class="fa-solid fa-check-circle mr-2"></i> {{ session('success') }}</span>
+                </div>
+            </div>
+            @endif
+
+            @if(session('error'))
+            <div class="max-w-6xl mx-auto mt-6 px-6 md:px-10">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <span class="block sm:inline font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ session('error') }}</span>
+                </div>
+            </div>
+            @endif
             
             <div id="listView" class="p-6 md:p-10 w-full max-w-6xl mx-auto transition-all duration-300">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -54,67 +70,65 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <ul class="divide-y divide-gray-100" id="beritaList">
-                        
-                        <li class="p-5 hover:bg-gray-50 transition flex items-center gap-4 group">
-                            <input type="checkbox" class="delete-checkbox hidden w-5 h-5 text-red-600 rounded cursor-pointer accent-red-600 flex-shrink-0">
+                    <form id="formHapusData" action="{{ route('admin.berita.delete') }}" method="POST">
+                        @csrf
+                        <ul class="divide-y divide-gray-100" id="beritaList">
                             
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded uppercase">Berita</span>
-                                    <span class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> 10 Apr 2026</span>
+                            @forelse($beritas as $b)
+                            <li class="p-5 hover:bg-gray-50 transition flex items-center gap-4 group">
+                                <input type="checkbox" name="ids[]" value="{{ $b->id }}" class="delete-checkbox hidden w-5 h-5 text-red-600 rounded cursor-pointer accent-red-600 flex-shrink-0">
+                                
+                                @if($b->foto)
+                                <div class="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0 hidden sm:block">
+                                    <img src="{{ asset('images/berita/' . $b->foto) }}" class="w-full h-full object-cover" alt="Foto">
                                 </div>
-                                <h3 class="text-lg font-bold text-gray-800 truncate">Persiapan Menyambut Bulan Suci Ramadhan di Masjid Agung</h3>
-                            </div>
-                            
-                            <button class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition flex-shrink-0 shadow-sm border border-green-100">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                        </li>
+                                @endif
 
-                        <li class="p-5 hover:bg-gray-50 transition flex items-center gap-4 group">
-                            <input type="checkbox" class="delete-checkbox hidden w-5 h-5 text-red-600 rounded cursor-pointer accent-red-600 flex-shrink-0">
-                            
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded uppercase">Kegiatan</span>
-                                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">Kajian Kitab</span>
-                                    <span class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> 09 Apr 2026</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="{{ $b->kategori == 'berita' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700' }} text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                            {{ $b->kategori }}
+                                        </span>
+                                        @if($b->sub_kategori)
+                                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded capitalize">{{ str_replace('_', ' ', $b->sub_kategori) }}</span>
+                                        @endif
+                                        <span class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> {{ $b->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-gray-800 truncate">{{ $b->judul }}</h3>
                                 </div>
-                                <h3 class="text-lg font-bold text-gray-800 truncate">Kajian Kitab Tafsir Jalalain Bersama KH. Ahmad Fauzi</h3>
-                            </div>
-                            
-                            <button class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition flex-shrink-0 shadow-sm border border-green-100">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                        </li>
+                                
+                                <button type="button"
+                                    class="btn-edit w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center"
+                                    data-id="{{ $b->id }}"
+                                    data-judul="{{ $b->judul }}"
+                                    data-isi="{{ $b->isi_konten }}"
+                                    data-kategori="{{ $b->kategori }}"
+                                    data-sub="{{ $b->sub_kategori }}"
+                                    data-foto="{{ $b->foto }}">
+                                    
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                            </li>
+                            @empty
+                            <li class="p-8 text-center text-gray-500 font-medium">
+                                <i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-300 block"></i>
+                                Belum ada publikasi berita atau kegiatan.
+                            </li>
+                            @endforelse
 
-                        <li class="p-5 hover:bg-gray-50 transition flex items-center gap-4 group">
-                            <input type="checkbox" class="delete-checkbox hidden w-5 h-5 text-red-600 rounded cursor-pointer accent-red-600 flex-shrink-0">
-                            
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded uppercase">Kegiatan</span>
-                                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">Agenda</span>
-                                </div>
-                                <h3 class="text-lg font-bold text-gray-800 truncate">Peringatan Nuzulul Qur'an 1447 H</h3>
-                            </div>
-                            
-                            <button class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition flex-shrink-0 shadow-sm border border-green-100">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                        </li>
-                    </ul>
+                        </ul>
+                    </form>
                 </div>
             </div>
 
             <div id="formView" class="hidden p-6 md:p-10 w-full max-w-4xl mx-auto transition-all duration-300">
                 <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4">Tulis Publikasi Baru</h2>
+                    <h2 id="formTitle" class="text-2xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4">Tulis Publikasi Baru</h2>
                     
-                    <form action="#" method="POST" enctype="multipart/form-data">
+                    <form id="formPublikasi" action="{{ route('admin.berita.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
+                        <input type="hidden" name="berita_id" id="berita_id" value="">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Kategori Utama *</label>
@@ -157,15 +171,16 @@
                             <button type="button" id="btnBatalForm" class="px-6 py-3 rounded-lg text-gray-600 font-bold hover:bg-gray-100 transition border border-gray-300">
                                 Batal
                             </button>
-                            <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-8 py-3 rounded-lg font-bold shadow-md transition flex items-center gap-2">
-                                <i class="fa-solid fa-save"></i> Simpan Publikasi
+                            <button type="submit" id="btnSubmitForm" class="bg-green-700 hover:bg-green-800 text-white px-8 py-3 rounded-lg font-bold shadow-md transition flex items-center gap-2">
+                                <i class="fa-solid fa-save"></i><span> Simpan Publikasi </span>
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-        </div> </main>
+        </div> 
+    </main>
 
     <script>
         // --- LOGIKA FORM TAMBAH ---
@@ -174,25 +189,78 @@
         const btnTambah = document.getElementById('btnTambah');
         const btnBatalForm = document.getElementById('btnBatalForm');
         
-        // Logika Dropdown Kategori & Sub-Kategori
+       const formPublikasi = document.getElementById('formPublikasi');
+        const formTitle = document.getElementById('formTitle');
+        const btnSubmitForm = document.getElementById('btnSubmitForm').querySelector('span');
         const inputKategori = document.getElementById('inputKategori');
         const wrapperSubKategori = document.getElementById('wrapperSubKategori');
 
-        // Buka form tambah
+        // JIKA TOMBOL "TAMBAH BERITA" DIKLIK
         btnTambah.addEventListener('click', () => {
+            document.getElementById('berita_id').value = ''; // Kosongkan ID
+            formPublikasi.reset(); // Bersihkan isi form dari bekas ketikan sebelumnya
+            
+            // Kembalikan form ke mode "Tambah"
+            formTitle.innerText = 'Tulis Publikasi Baru';
+            btnSubmitForm.innerText = 'Simpan Publikasi';
+            formPublikasi.action = "{{ route('admin.berita.store') }}"; 
+            
+            wrapperSubKategori.classList.add('hidden');
+            wrapperSubKategori.querySelector('select').required = false;
+
             listView.classList.add('hidden');
             formView.classList.remove('hidden');
         });
 
-        // Tutup form tambah
+        // JIKA TOMBOL PENSIL "EDIT" DIKLIK
+        const btnEdits = document.querySelectorAll('.btn-edit');
+        btnEdits.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 1. Sedot data dari tombol pensil yang diklik (menggunakan data-*)
+                const id = this.getAttribute('data-id');
+                const judul = this.getAttribute('data-judul');
+                const isi = this.getAttribute('data-isi');
+                const kategori = this.getAttribute('data-kategori');
+                const subKategori = this.getAttribute('data-sub');
+
+                // 2. Suntikkan data tersebut ke dalam kotak input form
+                document.getElementById('berita_id').value = id;
+                document.querySelector('input[name="judul"]').value = judul;
+                document.querySelector('textarea[name="isi_konten"]').value = isi;
+                document.getElementById('inputKategori').value = kategori;
+
+                // 3. Atur kemunculan sub-kategori
+                if (kategori === 'kegiatan') {
+                    wrapperSubKategori.classList.remove('hidden');
+                    const subSelect = wrapperSubKategori.querySelector('select');
+                    subSelect.required = true;
+                    subSelect.value = subKategori;
+                } else {
+                    wrapperSubKategori.classList.add('hidden');
+                    wrapperSubKategori.querySelector('select').required = false;
+                }
+
+                // 4. Ubah form ke mode "Edit"
+                formTitle.innerText = 'Edit Publikasi';
+                btnSubmitForm.innerText = 'Update Publikasi';
+                // Ubah tujuan URL agar masuk ke fungsi Update di Controller
+                formPublikasi.action = `/admin/berita/update/${id}`; 
+
+                // 5. Munculkan formnya ke layar
+                listView.classList.add('hidden');
+                formView.classList.remove('hidden');
+                document.getElementById('scrollArea').scrollTop = 0;
+            });
+        });
+
+        // JIKA TOMBOL BATAL DIKLIK
         btnBatalForm.addEventListener('click', () => {
             formView.classList.add('hidden');
             listView.classList.remove('hidden');
-            // Opsional: scroll kembali ke atas
             document.getElementById('scrollArea').scrollTop = 0;
         });
 
-        // Tampilkan sub-kategori jika 'Kegiatan' dipilih
+        // LOGIKA DROPDOWN SUB-KATEGORI OTOMATIS
         inputKategori.addEventListener('change', function() {
             if (this.value === 'kegiatan') {
                 wrapperSubKategori.classList.remove('hidden');
@@ -200,12 +268,12 @@
             } else {
                 wrapperSubKategori.classList.add('hidden');
                 wrapperSubKategori.querySelector('select').required = false;
-                wrapperSubKategori.querySelector('select').value = ""; // Reset value
+                wrapperSubKategori.querySelector('select').value = ""; 
             }
         });
 
 
-        // --- LOGIKA MODE HAPUS (FREEZE EXCEL) ---
+        // --- LOGIKA MODE HAPUS ---
         const btnToggleHapus = document.getElementById('btnToggleHapus');
         const stickyHapusBar = document.getElementById('stickyHapusBar');
         const btnBatalHapus = document.getElementById('btnBatalHapus');
@@ -253,17 +321,16 @@
             cb.addEventListener('change', updateHapusCount);
         });
 
-        // Simulasi Eksekusi Hapus
+        // Eksekusi Hapus Sungguhan ke Backend
         btnKonfirmasiHapus.addEventListener('click', () => {
             const checkedCount = document.querySelectorAll('.delete-checkbox:checked').length;
             if (checkedCount === 0) {
-                alert('Pilih minimal 1 berita untuk dihapus!');
+                alert('Pilih minimal 1 publikasi untuk dihapus!');
                 return;
             }
-            if(confirm(`Yakin ingin menghapus ${checkedCount} berita secara permanen?`)) {
-                // Di sini nanti diletakkan logika submit form ke Laravel (destroy)
-                alert('Berhasil dihapus! (Simulasi)');
-                toggleModeHapus(false);
+            if(confirm(`Yakin ingin menghapus ${checkedCount} publikasi secara permanen? Data dan foto yang terhapus tidak dapat dikembalikan.`)) {
+                // Men-submit form penghapusan ke Controller
+                document.getElementById('formHapusData').submit();
             }
         });
     </script>
