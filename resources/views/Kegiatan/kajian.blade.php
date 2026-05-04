@@ -1,3 +1,8 @@
+@php
+$kajianKitab = $kajianKitab ?? collect();
+$kajianRutin = $kajianRutin ?? collect();
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -20,11 +25,21 @@
         <h2 class="text-2xl font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Kajian Kitab</h2>
         <div class="swiper kajianSwiper w-full py-4 mb-10">
             <div class="swiper-wrapper">
+                @forelse($kajianKitab as $item)
                 <div class="swiper-slide">
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full">
-                        <img src="https://images.unsplash.com/photo-1585036156171-384164a8c675?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition-transform" alt="Kajian Kitab 1">
+                    <div class="relative bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full group">
+                        <a href="{{ route('berita.show', $item->id) }}">
+                            <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/800x500' }}" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        </a>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3 text-sm">
+                            {{ $item->judul }}
+                        </div>
                     </div>
                 </div>
+                @empty
+                <p class="text-gray-500">Belum ada kajian kitab.</p>
+                @endforelse
             </div>
             <div class="swiper-pagination !relative !mt-6"></div>
         </div>
@@ -32,11 +47,21 @@
         <h2 class="text-2xl font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2 mt-8">Kajian Rutin</h2>
         <div class="swiper kajianSwiper w-full py-4 mb-4">
             <div class="swiper-wrapper">
+                @forelse($kajianRutin as $item)
                 <div class="swiper-slide">
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full">
-                        <img src="https://images.unsplash.com/photo-1609599006353-e629aaab31bf?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition-transform" alt="Kajian Rutin 1">
+                    <div class="relative bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full group">
+                        <a href="{{ route('berita.show', $item->id) }}">
+                            <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/800x500' }}" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        </a>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3 text-sm">
+                            {{ $item->judul }}
+                        </div>
                     </div>
                 </div>
+                @empty
+                <p class="text-gray-500">Belum ada kajian rutin.</p>
+                @endforelse
             </div>
             <div class="swiper-pagination !relative !mt-6"></div>
         </div>
@@ -46,7 +71,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // Setup slider untuk semua Swiper kajian
         const swipers = document.querySelectorAll('.kajianSwiper');
         swipers.forEach(function(swiperElem) {
             new Swiper(swiperElem, {
@@ -55,7 +79,7 @@
                 pagination: { el: swiperElem.querySelector('.swiper-pagination'), clickable: true },
                 breakpoints: {
                     640: { slidesPerView: 2, spaceBetween: 20 },
-                    1024: { slidesPerView: 4, spaceBetween: 30 }, // Menampilkan 4 poster di layar PC
+                    1024: { slidesPerView: 4, spaceBetween: 30 },
                 }
             });
         });

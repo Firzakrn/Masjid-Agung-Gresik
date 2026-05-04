@@ -16,4 +16,15 @@ class Berita extends Model
         'foto', 
         'isi_konten'
     ];
+     // 🔥 Scope untuk filter kategori
+    public function scopeKategori($query, $kategori)
+    {
+        return $query->where('kategori', $kategori);
+    }
+
+    // 🔥 Scope untuk filter sub kategori
+    public function scopeSubKategori($query, $sub)
+    {
+        return $query->where('sub_kategori', $sub);
+    }
 }

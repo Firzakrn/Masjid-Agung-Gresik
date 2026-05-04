@@ -154,4 +154,61 @@ class BeritaController extends Controller
 
         return view('kegiatan.semuaberita', compact('semuaBerita', 'kajian', 'agenda', 'pendidikan'));
     }
+    public function kajian()
+    {
+        $kajianKitab = Berita::where('sub_kategori', 'kajian_kitab')
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+        $kajianRutin = Berita::where('sub_kategori', 'kajian_rutin')
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+        return view('kegiatan.kajian', compact('kajianKitab', 'kajianRutin'));
+    }
+    public function agenda()
+    {
+        $heroAgenda = Berita::where('sub_kategori', 'agenda')
+                            ->orderBy('created_at', 'desc')
+                            ->take(5) // Maksimal 5 slide di hero
+                            ->get();
+
+        $agendaPosters = Berita::where('sub_kategori', 'agenda')
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+        return view('kegiatan.agenda', compact('heroAgenda', 'agendaPosters'));
+    }
+
+    public function agendaShow($id)
+    {
+        $agenda = Berita::findOrFail($id);
+
+        $agendaTerbaru = Berita::where('sub_kategori', 'agenda')
+                            ->orderBy('created_at', 'desc')
+                            ->take(5)
+                            ->get();
+
+        return view('kegiatan.agenda_detail', compact('agenda', 'agendaTerbaru'));
+    }
+    public function pendidikan()
+    {
+        $pendidikanPosters = Berita::where('sub_kategori', 'pendidikan')
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+
+        return view('kegiatan.pendidikan', compact('pendidikanPosters'));
+    }
+
+    public function pendidikanShow($id)
+    {
+        $pendidikan = Berita::findOrFail($id);
+
+        $pendidikanTerbaru = Berita::where('sub_kategori', 'pendidikan')
+                                ->orderBy('created_at', 'desc')
+                                ->take(5)
+                                ->get();
+
+        return view('kegiatan.pendidikan_detail', compact('pendidikan', 'pendidikanTerbaru'));
+    }
 }

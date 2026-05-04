@@ -1,3 +1,7 @@
+@php
+$pendidikanPosters = $pendidikanPosters ?? collect();
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -19,11 +23,22 @@
 
         <div class="swiper pendidikanSwiper w-full py-4">
             <div class="swiper-wrapper">
+                @forelse($pendidikanPosters as $item)
                 <div class="swiper-slide">
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden h-[450px] w-full">
-                        <img src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition-transform" alt="Poster Pendidikan">
+                    <div class="relative bg-white rounded-xl shadow-md overflow-hidden h-[450px] w-full group">
+                        <a href="{{ route('pendidikan.show', $item->id) }}">
+                            <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/800x500' }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                alt="{{ $item->judul }}">
+                        </a>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3 text-sm">
+                            {{ $item->judul }}
+                        </div>
                     </div>
                 </div>
+                @empty
+                <p class="text-gray-500">Belum ada program pendidikan.</p>
+                @endforelse
             </div>
             <div class="swiper-pagination !relative !mt-6"></div>
         </div>

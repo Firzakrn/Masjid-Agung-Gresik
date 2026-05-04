@@ -6,6 +6,38 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\KeuanganController;
+use App\Http\Controllers\MidtransController;
+
+// ============================================================
+// ROUTE ADMIN KEUANGAN
+// ============================================================
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Halaman utama keuangan
+    Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
+
+    // Laporan arus kas (AJAX)
+    Route::get('/keuangan/laporan', [KeuanganController::class, 'laporan'])->name('keuangan.laporan');
+
+    // ACC & Tolak DP
+    Route::post('/keuangan/acc-dp/{id}', [KeuanganController::class, 'accDp'])->name('keuangan.accDp');
+    Route::post('/keuangan/tolak-dp/{id}', [KeuanganController::class, 'tolakDp'])->name('keuangan.tolakDp');
+
+    // Transaksi manual
+    Route::post('/keuangan/transaksi', [KeuanganController::class, 'tambahManual'])->name('keuangan.tambah');
+
+    // Kategori
+    Route::post('/keuangan/kategori', [KeuanganController::class, 'tambahKategori'])->name('keuangan.tambahKategori');
+    Route::delete('/keuangan/kategori/{id}', [KeuanganController::class, 'hapusKategori'])->name('keuangan.hapusKategori');
+});
+
+// ============================================================
+// ROUTE JAMAAH — Upload Bukti DP
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reservasi/{id}/upload-dp', [ReservasiController::class, 'uploadBuktiDp'])->name('reservasi.uploadDp');
+});
 
 // --- Bagian Home & Berita ----------------
 Route::get('/', [BeritaController::class, 'home'])->name('home');
@@ -56,8 +88,12 @@ Route::get('/reservasi/socialevent', function () {
     // Step 3 : pembayaran
         Route::get('/reservasi/pembayaran/{id}', [ReservasiController::class, 'pembayaran'])->name('reservasi.pembayaran');
         // Invoice akhir
-        Route::post('/reservasi/selesai/{id}', [ReservasiController::class, 'selesai'])->name('reservasi.selesai');
+        Route::get('/reservasi/selesai/{id}', [ReservasiController::class, 'selesai'])->name('reservasi.selesai');
         Route::get('/riwayat', [UserController::class, 'riwayat'])->name('riwayat.index');
+
+        // ── BARU: Endpoint Midtrans ────────────────────────────────
+        Route::post('/reservasi/snap-token/{id}', [ReservasiController::class, 'snapToken'])->name('reservasi.snap-token');
+        Route::get('/reservasi/check-status/{id}', [ReservasiController::class, 'checkStatus'])->name('reservasi.check-status');
 });
 // ------------------------------------
 
@@ -89,24 +125,6 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login']); 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // --- Rute Verifikasi Email -----------------
-    // 1. Halaman pemberitahuan cek email
-    Route::get('/email/verify', function () {
-        return view('verify-email');
-    })->middleware('auth')->name('verification.notice');
-
-    // 2. Proses saat user klik link di email
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-        return redirect('/')->with('welcome', 'Alhamdulillah, Email berhasil diverifikasi!');
-    })->middleware(['auth', 'signed'])->name('verification.verify');
-
-    // 3. Tombol kirim ulang email
-    Route::post('/email/verification-notification', function (Request $request) {
-        $request->user()->sendEmailVerificationNotification();
-        return back()->with('message', 'Link verifikasi baru telah dikirim!');
-    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
 
 /* -----------------
         ADMIN
@@ -131,6 +149,16 @@ Route::post('/admin/berita/update/{id}', [BeritaController::class, 'update'])->n
 Route::post('/admin/berita/delete', [BeritaController::class, 'destroy'])->name('admin.berita.delete');
 // ---------------------------------------------
 
-Route::get('/admin/pencatatan', function () {
-    return view('admin.pencatatan'); 
-})->name('admin.pencatatan');
+Route::get('/admin/pencatatan', [KeuanganController::class, 'index'])->name('admin.pencatatan');
+
+// Pastikan seperti ini, bukan route lain
+Route::get('/kegiatan/kajian', [BeritaController::class, 'kajian']);
+Route::get('/kegiatan/agenda', [BeritaController::class, 'agenda'])->name('agenda.index');
+Route::get('/kegiatan/agenda/{id}', [BeritaController::class, 'agendaShow'])->name('agenda.show');
+Route::get('/kegiatan/pendidikan', [BeritaController::class, 'pendidikan'])->name('pendidikan.index');
+Route::get('/kegiatan/pendidikan/{id}', [BeritaController::class, 'pendidikanShow'])->name('pendidikan.show');
+
+// ── Webhook Midtrans (TANPA auth, TANPA CSRF) ──────────────────
+// Midtrans memanggil ini dari server mereka, bukan dari browser user
+Route::post('/midtrans/notification', [MidtransController::class, 'handleNotification'])
+    ->name('midtrans.notification');

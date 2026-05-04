@@ -9,12 +9,27 @@ class Reservasi extends Model
 {
     use HasFactory;
 
-    // Mengizinkan semua kolom diisi (kecuali id)
     protected $guarded = ['id'];
 
-    // Relasi: 1 Reservasi dimiliki oleh 1 User
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Tambah ini saja
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
+    public function getHargaPaket(): array
+    {
+        if (stripos($this->paket, 'Intimate Wedding') !== false)
+            return ['harga' => 2500000, 'dp' => 1000000];
+        if (stripos($this->paket, 'Wedding') !== false)
+            return ['harga' => 12500000, 'dp' => 3000000];
+        if (stripos($this->paket, 'Akad') !== false)
+            return ['harga' => 3000000, 'dp' => 1000000];
+
+        return ['harga' => 7500000, 'dp' => 2000000];
     }
 }
