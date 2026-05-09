@@ -16,23 +16,9 @@ class UserController extends Controller
                                ->orderBy('created_at', 'desc')
                                ->get();
 
-        // 2. Tarik riwayat ZIS. 
-        // (Contoh ini pakai array dummy karena aku belum tahu struktur tabel ZIS-mu. 
-        // Nanti bisa kamu ganti pakai query Eloquent seperti reservasi di atas).
-        $riwayatZis = [
-            (object)[
-                'jenis' => 'Zakat Fitrah',
-                'tanggal' => '2026-04-20',
-                'nominal' => 150000,
-                'status' => 'Berhasil'
-            ],
-            (object)[
-                'jenis' => 'Infaq Pembangunan',
-                'tanggal' => '2026-03-15',
-                'nominal' => 500000,
-                'status' => 'Menunggu Verifikasi'
-            ]
-        ];
+        // 2. Buat variabel kosong sementara untuk ZIS (karena modelnya belum aktif)
+        // Ini mencegah error "Undefined variable" di halaman riwayat
+        $riwayatZis = [];
 
         return view('riwayat', compact('reservasis', 'riwayatZis'));
     }

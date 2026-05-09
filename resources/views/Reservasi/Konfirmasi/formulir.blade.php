@@ -18,6 +18,9 @@
         $harga_paket = 0; 
         $isAula = false;
         $bgImage = 'majlis.jpg';
+        
+        // PENANDA BARU UNTUK SOCIAL EVENT
+        $isSocialEvent = false; 
 
         if (stripos($paket, 'Intimate Wedding') !== false) {
             $harga_paket = 2500000;
@@ -38,16 +41,19 @@
             $dp = 2000000;
             $isAula = true; 
             $bgImage = 'work.jpg'; 
+            $isSocialEvent = true; // Tandai sebagai Social Event
         } elseif (stripos($paket, 'Wisuda') !== false) {
             $harga_paket = 7500000;
             $dp = 2000000;
             $isAula = true;
             $bgImage = 'wisuda.jpg'; 
+            $isSocialEvent = true; // Tandai sebagai Social Event
         } elseif (stripos($paket, 'Majelis') !== false) {
             $harga_paket = 7500000;
             $dp = 2000000;
             $isAula = true;
             $bgImage = 'majlis.jpg'; 
+            $isSocialEvent = true; // Tandai sebagai Social Event
         } 
     @endphp
 
@@ -55,10 +61,8 @@
 
     <div class="max-w-6xl mx-auto px-4 py-12">
         
-        <!-- PROGRESS BAR YANG SUDAH DIRAPIKAN -->
         <div class="flex items-center justify-center gap-2 md:gap-6 mb-12 overflow-x-auto pb-4">
             
-            <!-- STEP 1: JADWAL (Selesai - Centang Biru) -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-sm">
                     <i class="fa-solid fa-check text-sm"></i>
@@ -70,7 +74,6 @@
 
             <div class="w-6 md:w-12 h-0.5 bg-blue-600"></div>
 
-            <!-- STEP 2: LOGIN (Selesai - Centang Biru) -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-sm">
                     <i class="fa-solid fa-check text-sm"></i>
@@ -82,7 +85,6 @@
 
             <div class="w-6 md:w-12 h-0.5 bg-blue-600"></div>
 
-            <!-- STEP 3: FORMULIR (Aktif - Angka 3 Biru) -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 border border-blue-200 font-bold flex items-center justify-center text-lg shadow-sm">
                     3
@@ -94,7 +96,6 @@
 
             <div class="w-6 md:w-12 h-0.5 bg-slate-200"></div>
 
-            <!-- STEP 4: PEMBAYARAN (Pending - Angka 4 Abu-abu) -->
             <div class="flex items-center gap-3 opacity-50">
                 <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 font-bold flex items-center justify-center text-lg">
                     4
@@ -108,18 +109,14 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- KOLOM KIRI: FORMULIR UTAMA -->
             <div class="lg:col-span-8 bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10">
                 
-                <!-- PENTING: enctype="multipart/form-data" wajib untuk upload file -->
                 <form action="{{ route('reservasi.submit') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <!-- Data Tersembunyi dari Tahap Sebelumnya -->
                     <input type="hidden" name="paket" value="{{ $paket }}">
                     <input type="hidden" name="tanggal" value="{{ $tanggal }}">
                     <input type="hidden" name="sesi" value="{{ $sesi }}">
 
-                    <!-- BAGIAN 1: DATA PEMOHON -->
                     <div class="mb-10">
                         <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">1. Data Pemohon</h2>
                         <div class="space-y-4">
@@ -135,116 +132,113 @@
                                 <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
                                 <input type="tel" name="telp_pemohon" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start pt-2">
+                                <label class="text-sm font-semibold text-slate-700 mt-2">Memo / Catatan Tambahan</label>
+                                <textarea name="memo_pemohon" placeholder="Tuliskan catatan khusus atau permintaan tambahan di sini..." class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- BAGIAN 2: DATA CALON MEMPELAI -->
-                    <div class="mb-10">
-                        <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">2. Data Calon Mempelai</h2>
+                    @if(!$isSocialEvent)
                         
-                        <!-- A. Calon Pengantin Pria (CPP) -->
-                        <h3 class="text-md font-bold text-slate-800 mb-4 pl-4 border-l-4 border-blue-500">A. Calon Pengantin Pria (CPP)</h3>
-                        <div class="space-y-4 mb-8">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Nama (CPP) <span class="text-red-500">*</span></label>
-                                <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                                    <input type="text" name="nama_cpp" required placeholder="Nama (CPP)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-semibold">Bin <span class="text-red-500">*</span></span>
-                                        <input type="text" name="bin_cpp" required placeholder="Bin" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">2. Data Calon Mempelai</h2>
+                            
+                            <h3 class="text-md font-bold text-slate-800 mb-4 pl-4 border-l-4 border-blue-500">A. Calon Pengantin Pria (CPP)</h3>
+                            <div class="space-y-4 mb-8">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Nama (CPP) <span class="text-red-500">*</span></label>
+                                    <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                        <input type="text" name="nama_cpp" required placeholder="Nama (CPP)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-semibold">Bin <span class="text-red-500">*</span></span>
+                                            <input type="text" name="bin_cpp" required placeholder="Bin" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                <input type="text" name="alamat_cpp" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                <input type="tel" name="telp_cpp" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                        </div>
-
-                        <!-- B. Calon Pengantin Wanita (CPW) -->
-                        <h3 class="text-md font-bold text-slate-800 mb-4 pl-4 border-l-4 border-pink-500">B. Calon Pengantin Wanita (CPW)</h3>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Nama (CPW) <span class="text-red-500">*</span></label>
-                                <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                                    <input type="text" name="nama_cpw" required placeholder="Nama (CPW)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-semibold">Binti <span class="text-red-500">*</span></span>
-                                        <input type="text" name="binti_cpw" required placeholder="Binti" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
-                                    </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
+                                    <input type="text" name="alamat_cpp" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
+                                    <input type="tel" name="telp_cpp" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                <input type="text" name="alamat_cpw" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                <input type="tel" name="telp_cpw" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+
+                            <h3 class="text-md font-bold text-slate-800 mb-4 pl-4 border-l-4 border-pink-500">B. Calon Pengantin Wanita (CPW)</h3>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Nama (CPW) <span class="text-red-500">*</span></label>
+                                    <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                        <input type="text" name="nama_cpw" required placeholder="Nama (CPW)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-semibold">Binti <span class="text-red-500">*</span></span>
+                                            <input type="text" name="binti_cpw" required placeholder="Binti" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
+                                    <input type="text" name="alamat_cpw" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
+                                    <input type="tel" name="telp_cpw" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- BAGIAN 3: DATA WALI -->
-                    <div class="mb-10">
-                        <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">3. Data Wali</h2>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Nama Wali (CPW) <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama_wali" required placeholder="Nama Wali (CPW)" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                <input type="text" name="alamat_wali" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                <input type="tel" name="telp_wali" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-6">
-                                <label class="text-sm font-semibold text-slate-700">KUA dari Kecamatan <span class="text-red-500">*</span></label>
-                                <input type="text" name="kua_kecamatan" required placeholder="KUA dari Kecamatan" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">3. Data Wali</h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Nama Wali (CPW) <span class="text-red-500">*</span></label>
+                                    <input type="text" name="nama_wali" required placeholder="Nama Wali (CPW)" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
+                                    <input type="text" name="alamat_wali" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
+                                    <input type="tel" name="telp_wali" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-6">
+                                    <label class="text-sm font-semibold text-slate-700">KUA dari Kecamatan <span class="text-red-500">*</span></label>
+                                    <input type="text" name="kua_kecamatan" required placeholder="KUA dari Kecamatan" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- BAGIAN UPLOAD DOKUMEN -->
-                    <div class="mb-10">
-                        <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">Upload Dokumen</h2>
-                        <div class="space-y-4">
-                            <!-- Input File 1 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Surat Rekomendasi dari KUA</label>
-                                <input type="file" name="surat_rekomendasi" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <!-- Input File 2 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Foto KTP Pria (CPP)</label>
-                                <input type="file" name="foto_ktp_cpp" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <!-- Input File 3 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Foto KTP Wanita (CPW)</label>
-                                <input type="file" name="foto_ktp_cpw" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <!-- Input File 4 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Foto Pria (CPP) 3x4</label>
-                                <input type="file" name="foto_cpp_3x4" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <!-- Input File 5 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                <label class="text-sm font-semibold text-slate-700">Foto Wanita (CPW) 3x4</label>
-                                <input type="file" name="foto_cpw_3x4" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">Upload Dokumen</h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Surat Rekomendasi dari KUA</label>
+                                    <input type="file" name="surat_rekomendasi" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Foto KTP Pria (CPP)</label>
+                                    <input type="file" name="foto_ktp_cpp" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Foto KTP Wanita (CPW)</label>
+                                    <input type="file" name="foto_ktp_cpw" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Foto Pria (CPP) 3x4</label>
+                                    <input type="file" name="foto_cpp_3x4" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    <label class="text-sm font-semibold text-slate-700">Foto Wanita (CPW) 3x4</label>
+                                    <input type="file" name="foto_cpw_3x4" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- TOMBOL NAVIGASI -->
+                    @endif
+
                     <div class="flex justify-between items-center pt-6 border-t border-slate-200">
                         <a href="{{ route('reservasi.tgl', ['paket' => $paket]) }}" class="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-600 transition">
                             <i class="fa-solid fa-chevron-left text-2xl"></i> Back
@@ -257,7 +251,6 @@
                 </form>
             </div>
 
-            <!-- KOLOM KANAN: RINGKASAN RESERVASI -->
             <div class="lg:col-span-4">
                 <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 sticky top-10">
                     <h3 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Informasi Reservasi</h3>
@@ -280,7 +273,8 @@
                     <div class="space-y-6">
                         <div>
                             <span class="text-slate-800 font-semibold block mb-1">Biaya :</span>
-                            <div class="text-2xl text-slate-900">Rp {{ number_format($harga, 0, ',', '.') }}</div>
+                            {{-- Memastikan pakai variabel yang benar dari Controller/Blade sebelumnya --}}
+                            <div class="text-2xl text-slate-900">Rp {{ number_format($harga_paket ?? $harga, 0, ',', '.') }}</div>
                         </div>
                         <div>
                             <span class="text-slate-800 font-semibold block mb-1">DP :</span>

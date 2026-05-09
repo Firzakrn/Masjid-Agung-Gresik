@@ -8,36 +8,8 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\MidtransController;
-
-// ============================================================
-// ROUTE ADMIN KEUANGAN
-// ============================================================
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-
-    // Halaman utama keuangan
-    Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
-
-    // Laporan arus kas (AJAX)
-    Route::get('/keuangan/laporan', [KeuanganController::class, 'laporan'])->name('keuangan.laporan');
-
-    // ACC & Tolak DP
-    Route::post('/keuangan/acc-dp/{id}', [KeuanganController::class, 'accDp'])->name('keuangan.accDp');
-    Route::post('/keuangan/tolak-dp/{id}', [KeuanganController::class, 'tolakDp'])->name('keuangan.tolakDp');
-
-    // Transaksi manual
-    Route::post('/keuangan/transaksi', [KeuanganController::class, 'tambahManual'])->name('keuangan.tambah');
-
-    // Kategori
-    Route::post('/keuangan/kategori', [KeuanganController::class, 'tambahKategori'])->name('keuangan.tambahKategori');
-    Route::delete('/keuangan/kategori/{id}', [KeuanganController::class, 'hapusKategori'])->name('keuangan.hapusKategori');
-});
-
-// ============================================================
-// ROUTE JAMAAH — Upload Bukti DP
-// ============================================================
-Route::middleware(['auth'])->group(function () {
-    Route::post('/reservasi/{id}/upload-dp', [ReservasiController::class, 'uploadBuktiDp'])->name('reservasi.uploadDp');
-});
+use App\Models\Pembayaran;
+use App\Models\Berita;
 
 // --- Bagian Home & Berita ----------------
 Route::get('/', [BeritaController::class, 'home'])->name('home');
@@ -57,15 +29,27 @@ Route::get('/profile/struktur', function () {
 
 // --- Bagian Kegiatan ----------------
 Route::get('/kegiatan/agenda', function () {
-    return view('kegiatan.agenda');
+    // Ambil 3 agenda terbaru untuk Slider Hero (Highlight)
+    $agendaHighlight = Berita::where('sub_kategori', 'agenda')->orderBy('created_at', 'desc')->take(3)->get();
+
+    return view('Kegiatan.agenda', compact('agendaHighlight', 'agendaPosters'));
 })->name('kegiatan.agenda');
 
 Route::get('/kegiatan/kajian', function () {
-    return view('kegiatan.kajian');
+    $kajianKitab = Berita::where('sub_kategori', 'kajian_kitab')
+                        ->orderBy('created_at', 'desc')->get();
+
+    $kajianRutin = Berita::where('sub_kategori', 'kajian_rutin')
+                        ->orderBy('created_at', 'desc')->get();
+
+    return view('kegiatan.kajian', compact('kajianKitab', 'kajianRutin'));
 })->name('kegiatan.kajian');
 
 Route::get('/kegiatan/pendidikan', function () {
-    return view('kegiatan.pendidikan');
+    $pendidikanPosters = Berita::where('sub_kategori', 'pendidikan')
+                               ->orderBy('created_at', 'desc')
+                               ->get();
+    return view('Kegiatan.pendidikan', compact('pendidikanPosters'));
 })->name('kegiatan.pendidikan');
 // ------------------------------------
 
@@ -101,14 +85,15 @@ Route::get('/reservasi/socialevent', function () {
 Route::get('/infaq/pencatatan', function () {
     return view('infaq.pencatatan'); 
 })->name('infaq.pencatatan');
+    Route::get('/api/laporan-keuangan', [App\Http\Controllers\KeuanganController::class, 'laporan'])->name('public.keuangan.laporan');
 
-Route::get('/infaq/zakat', function () {
-    return view('infaq.zakat'); 
-})->name('infaq.zakat');
+Route::get('/infaq/edZakat', function () {
+    return view('infaq.edZakat'); 
+})->name('infaq.edZakat');
 
-Route::get('/infaq/infaq', function () {
-    return view('infaq.infaq'); 
-})->name('infaq.infaq');
+Route::get('/infaq/edInfaq', function () {
+    return view('infaq.edInfaq'); 
+})->name('infaq.edInfaq');
 // ------------------------------------
 
 
@@ -133,13 +118,23 @@ Route::get('/admin/login', function () {
     return view('admin.admin_login');
 })->name('admin.login');
 
-// Rute untuk memproses form login Admin
-Route::post('/admin/login', function () {
-    return redirect()->route('admin.dashboard');
-})->name('admin.login.submit');
+Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 
 Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard'); 
+    $antreanDp = \App\Models\Reservasi::whereIn('status_dp', ['menunggu', 'menunggu_konfirmasi'])
+                ->latest()
+                ->take(5)
+                ->get();
+    
+    $beritaTerbaru = \App\Models\Berita::latest()->take(5)->get();
+    
+    // Tambahan untuk widget di atas (total jamaah dll)
+    $totalJamaah = \App\Models\User::where('role', 'jamaah')->count();
+    $jamaahBaruBulanIni = \App\Models\User::where('role', 'jamaah')
+                            ->whereMonth('created_at', now()->month)
+                            ->count();
+
+    return view('Admin.dashboard', compact('antreanDp', 'beritaTerbaru', 'totalJamaah', 'jamaahBaruBulanIni'));
 })->name('admin.dashboard');
 
 // --- Berita ----------------------------------
@@ -150,9 +145,11 @@ Route::post('/admin/berita/delete', [BeritaController::class, 'destroy'])->name(
 // ---------------------------------------------
 
 Route::get('/admin/pencatatan', [KeuanganController::class, 'index'])->name('admin.pencatatan');
+Route::get('/admin/keuangan/laporan', [KeuanganController::class, 'laporan'])->name('admin.keuangan.laporan');
 
 // Pastikan seperti ini, bukan route lain
 Route::get('/kegiatan/kajian', [BeritaController::class, 'kajian']);
+Route::get('/kegiatan/detail/{id}', [BeritaController::class, 'show'])->name('kegiatan.detail');
 Route::get('/kegiatan/agenda', [BeritaController::class, 'agenda'])->name('agenda.index');
 Route::get('/kegiatan/agenda/{id}', [BeritaController::class, 'agendaShow'])->name('agenda.show');
 Route::get('/kegiatan/pendidikan', [BeritaController::class, 'pendidikan'])->name('pendidikan.index');
@@ -162,3 +159,33 @@ Route::get('/kegiatan/pendidikan/{id}', [BeritaController::class, 'pendidikanSho
 // Midtrans memanggil ini dari server mereka, bukan dari browser user
 Route::post('/midtrans/notification', [MidtransController::class, 'handleNotification'])
     ->name('midtrans.notification');
+
+// ============================================================
+// ROUTE ADMIN KEUANGAN
+// ============================================================
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Halaman utama keuangan
+    Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
+
+    // Laporan arus kas 
+    Route::get('/keuangan/laporan', [KeuanganController::class, 'laporan'])->name('keuangan.laporan');
+
+    // ACC & Tolak DP
+    Route::post('/keuangan/acc-dp/{id}', [KeuanganController::class, 'accDp'])->name('keuangan.accDp');
+    Route::post('/keuangan/tolak-dp/{id}', [KeuanganController::class, 'tolakDp'])->name('keuangan.tolakDp');
+
+    // Transaksi manual
+    Route::post('/keuangan/transaksi', [KeuanganController::class, 'tambahManual'])->name('keuangan.tambah');
+
+    // Kategori
+    Route::post('/keuangan/kategori', [KeuanganController::class, 'tambahKategori'])->name('keuangan.tambahKategori');
+    Route::delete('/keuangan/kategori/{id}', [KeuanganController::class, 'hapusKategori'])->name('keuangan.hapusKategori');
+});
+
+// ============================================================
+// ROUTE JAMAAH — Upload Bukti DP
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reservasi/{id}/upload-dp', [ReservasiController::class, 'uploadBuktiDp'])->name('reservasi.uploadDp');
+});

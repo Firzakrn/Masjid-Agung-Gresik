@@ -202,13 +202,16 @@ class BeritaController extends Controller
 
     public function pendidikanShow($id)
     {
-        $pendidikan = Berita::findOrFail($id);
+        // 1. Ubah nama variabel menjadi $kegiatan agar dikenali oleh detail.blade.php
+        $kegiatan = Berita::findOrFail($id);
 
+        // 2. Data terbaru (opsional, siapa tahu nanti mau kamu tambahkan di pinggir halaman)
         $pendidikanTerbaru = Berita::where('sub_kategori', 'pendidikan')
                                 ->orderBy('created_at', 'desc')
                                 ->take(5)
                                 ->get();
 
-        return view('kegiatan.pendidikan_detail', compact('pendidikan', 'pendidikanTerbaru'));
+        // 3. Arahkan ke file Kegiatan/detail.blade.php yang baru
+        return view('Kegiatan.detail', compact('kegiatan', 'pendidikanTerbaru'));
     }
 }

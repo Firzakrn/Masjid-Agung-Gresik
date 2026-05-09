@@ -55,7 +55,7 @@
                     </div>
                     <h3 class="text-lg font-bold text-slate-800 mb-2">Belum ada reservasi</h3>
                     <p class="text-slate-500 mb-6">Anda belum pernah melakukan pemesanan fasilitas masjid.</p>
-                    <a href="{{ route('reservasi.wedding') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">Buat Reservasi Baru</a>
+                    <a href="{{ route('reservasi.socialevent') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">Buat Reservasi Baru</a>
                 </div>
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -118,7 +118,7 @@
                     </div>
                     <h3 class="text-lg font-bold text-slate-800 mb-2">Belum ada riwayat ZIS</h3>
                     <p class="text-slate-500 mb-6">Mari sempurnakan ibadah dengan menunaikan Zakat dan Infaq.</p>
-                    <a href="{{ url('/infaq/zakat') }}" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition">Tunaikan Sekarang</a>
+                    <a href="{{ url('/infaq/edZakat') }}" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition">Tunaikan Sekarang</a>
                 </div>
             @else
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

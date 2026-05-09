@@ -2,197 +2,185 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\KategoriKeuangan;
 use App\Models\Reservasi;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class KeuanganController extends Controller
 {
-    // ============================================================
-    // INDEX — Halaman utama keuangan
-    // ============================================================
     public function index()
     {
-        $antreanDp = Reservasi::whereIn('status_dp', ['menunggu', 'lunas'])
+        // Mencari status yang sesuai dengan database 
+        $antreanDp = Reservasi::whereIn('status_dp', ['menunggu', 'menunggu_konfirmasi'])
             ->with('user')
             ->latest()
             ->get();
 
         $riwayat = Transaksi::with(['kategori', 'reservasi'])
-            ->latest('tanggal')
+            ->orderBy('tanggal', 'desc') // desc = newest to oldest
+            ->orderBy('id', 'desc')      // jika tanggal sama, ID terbesar (terbaru) di atas
             ->get();
-
         $kategoriPemasukan  = KategoriKeuangan::where('jenis', 'pemasukan')->get();
         $kategoriPengeluaran = KategoriKeuangan::where('jenis', 'pengeluaran')->get();
         $jumlahPendingDp    = $antreanDp->count();
-
-        return view('admin.pencatatan', compact(
-            'antreanDp',
-            'riwayat',
-            'kategoriPemasukan',
-            'kategoriPengeluaran',
-            'jumlahPendingDp'
-        ));
+        $semuaReservasi = \App\Models\Reservasi::with(['transaksis'])
+        ->where('status_dp', '!=', 'ditolak')
+        ->latest()
+        ->get();
+        
+        return view('admin.pencatatan.index', compact('antreanDp', 'riwayat', 'kategoriPemasukan', 'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'));
     }
 
-    // ============================================================
-    // LAPORAN ARUS KAS
-    // ============================================================
-    public function laporan(Request $request)
-    {
-        $bulan = $request->get('bulan', now()->month);
-        $tahun = $request->get('tahun', now()->year);
-
-        $pemasukan = Transaksi::where('jenis', 'pemasukan')
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->with('kategori')
-            ->get();
-
-        $pengeluaran = Transaksi::where('jenis', 'pengeluaran')
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->with('kategori')
-            ->get();
-
-        $totalPemasukan   = $pemasukan->sum('nominal');
-        $totalPengeluaran = $pengeluaran->sum('nominal');
-        $surplus          = $totalPemasukan - $totalPengeluaran;
-
-        Carbon::setLocale('id');
-        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
-
-        $endOfMonth = Carbon::create($tahun, $bulan)->endOfMonth()->translatedFormat('j F Y');
-
-        return response()->json([
-            'pemasukan'        => $pemasukan,
-            'pengeluaran'      => $pengeluaran,
-            'totalPemasukan'   => $totalPemasukan,
-            'totalPengeluaran' => $totalPengeluaran,
-            'surplus'          => $surplus,
-            'periode'          => "1 $namaBulan $tahun - $endOfMonth",
-        ]);
-    }
-
-    // ============================================================
-    // ACC DP
-    // ============================================================
     public function accDp($id)
     {
-        $reservasi = Reservasi::findOrFail($id);
+        $rsv = Reservasi::findOrFail($id);
 
-        if ($reservasi->status_dp === 'disetujui') {
-            return back()->with('error', 'DP ini sudah pernah disetujui.');
+        // 1. Logika untuk menentukan Nama Kategori Otomatis
+        $paketLokal = strtolower($rsv->paket);
+        $namaKategori = 'DP Social Event'; // Kategori Default (untuk workshop, wisuda, majelis)
+
+        if (str_contains($paketLokal, 'wedding')) {
+            $namaKategori = 'DP Wedding';
+        } elseif (str_contains($paketLokal, 'akad')) {
+            $namaKategori = 'DP Akad';
         }
 
+        // 2. Cari kategori di database, kalau belum ada otomatis dibuatkan!
         $kategori = KategoriKeuangan::firstOrCreate(
-            ['nama' => 'Pemasukan DP Reservasi', 'jenis' => 'pemasukan']
+            ['nama' => $namaKategori],  
+            ['jenis' => 'pemasukan']
         );
 
+        // 3. Ubah status DP dan status utama menjadi lunas
+        $rsv->update([
+            'status_dp' => 'lunas',
+            'status'    => 'Sudah DP' 
+        ]);
+
+        // 4. Catat otomatis ke buku kas dengan kategori yang sudah dideteksi
         Transaksi::create([
-            'reservasi_id' => $reservasi->id,
+            'reservasi_id' => $rsv->id,
             'kategori_id'  => $kategori->id,
-            'sumber'       => 'reservasi',
+            'sumber'       => 'sistem',
             'jenis'        => 'pemasukan',
-            'keterangan'   => "DP {$reservasi->paket} - {$reservasi->nama_pemohon}",
-            'nominal'      => $this->hitungDp($reservasi->paket),
-            'tanggal'      => now()->toDateString(),
-            'bukti_bayar'  => $reservasi->bukti_dp,
+            'nominal'      => $rsv->nominal_dp,
+            'keterangan'   => $namaKategori . ': ' . $rsv->nama_pemohon . ' (#' . $rsv->id . ')',
+            'tanggal'      => now(),
         ]);
 
-        $reservasi->update([
-            'status_dp' => 'disetujui',
-            'status'    => 'DP Disetujui',
-        ]);
-
-        return redirect()->route('admin.pencatatan')
-            ->with('success', "DP #{$reservasi->id} berhasil di-ACC dan dicatat ke kas.");
+        return back()->with('success', 'Berhasil ACC! Data otomatis masuk ke kategori: ' . $namaKategori);
     }
 
-    // ============================================================
-    // TOLAK DP
-    // ============================================================
     public function tolakDp($id)
     {
-        $reservasi = Reservasi::findOrFail($id);
+        $rsv = Reservasi::findOrFail($id);
 
-        $reservasi->update([
+        // Ubah status DP dan status utama menjadi ditolak
+        $rsv->update([
             'status_dp' => 'ditolak',
-            'status'    => 'DP Ditolak - Harap Upload Ulang',
+            'status'    => 'Ditolak Admin' 
         ]);
 
-        return back()->with('info', "DP #{$reservasi->id} telah ditolak.");
+        return back()->with('success', 'Pembayaran DP atas nama ' . $rsv->nama_pemohon . ' berhasil ditolak.');
     }
 
-    // ============================================================
-    // TAMBAH TRANSAKSI MANUAL
-    // ============================================================
-    public function tambahManual(Request $request)
+    public function laporan(Request $request)
     {
-        $request->validate([
-            'tanggal'     => 'required|date',
-            'jenis'       => 'required|in:pemasukan,pengeluaran',
-            'kategori_id' => 'required|exists:kategori_keuangans,id',
-            'nominal'     => 'required|integer|min:1000',
-            'keterangan'  => 'nullable|string|max:255',
-        ]);
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
 
-        $kategori = KategoriKeuangan::find($request->kategori_id);
+        if ($bulan && $tahun) {
+            // Per bulan → jabarkan semua transaksi
+            $pemasukan   = Transaksi::with('kategori')->where('jenis', 'pemasukan')
+                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get();
+            $pengeluaran = Transaksi::with('kategori')->where('jenis', 'pengeluaran')
+                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get();
+            $periode = Carbon::create($tahun, $bulan)->translatedFormat('F Y');
+            $ringkasan = false;
 
-        Transaksi::create([
-            'reservasi_id' => null,
-            'kategori_id'  => $request->kategori_id,
-            'sumber'       => 'manual',
-            'jenis'        => $request->jenis,
-            'keterangan'   => $request->keterangan ?? $kategori->nama,
-            'nominal'      => $request->nominal,
-            'tanggal'      => $request->tanggal,
-        ]);
+        } else {
+            // Semua periode → group by kategori, tampil total per kategori saja
+            $pemasukan = Transaksi::with('kategori')->where('jenis', 'pemasukan')
+                ->get()
+                ->groupBy('kategori_id')
+                ->map(fn($group) => [
+                    'nama'    => $group->first()->kategori->nama ?? '-',
+                    'nominal' => $group->sum('nominal'),
+                ])->values();
 
-        return back()->with('success', 'Transaksi manual berhasil dicatat.');
-    }
+            $pengeluaran = Transaksi::with('kategori')->where('jenis', 'pengeluaran')
+                ->get()
+                ->groupBy('kategori_id')
+                ->map(fn($group) => [
+                    'nama'    => $group->first()->kategori->nama ?? '-',
+                    'nominal' => $group->sum('nominal'),
+                ])->values();
 
-    // ============================================================
-    // TAMBAH KATEGORI
-    // ============================================================
-    public function tambahKategori(Request $request)
-    {
-        $request->validate([
-            'nama'  => 'required|string|max:100',
-            'jenis' => 'required|in:pemasukan,pengeluaran',
-        ]);
-
-        KategoriKeuangan::create($request->only('nama', 'jenis'));
-
-        return back()->with('success', 'Kategori berhasil ditambahkan.');
-    }
-
-    // ============================================================
-    // HAPUS KATEGORI
-    // ============================================================
-    public function hapusKategori($id)
-    {
-        $kategori = KategoriKeuangan::findOrFail($id);
-
-        if ($kategori->transaksis()->count() > 0) {
-            return back()->with('error', 'Kategori tidak bisa dihapus karena masih digunakan oleh ' . $kategori->transaksis()->count() . ' transaksi.');
+            $periode  = 'Semua Periode';
+            $ringkasan = true;
         }
 
-        $kategori->delete();
-
-        return back()->with('success', 'Kategori berhasil dihapus.');
+        return response()->json([
+            'periode'          => $periode,
+            'ringkasan'        => $ringkasan,
+            'pemasukan'        => $pemasukan,
+            'pengeluaran'      => $pengeluaran,
+            'totalPemasukan'   => $pemasukan instanceof \Illuminate\Support\Collection ? $pemasukan->sum('nominal') : $pemasukan->sum('nominal'),
+            'totalPengeluaran' => $pengeluaran instanceof \Illuminate\Support\Collection ? $pengeluaran->sum('nominal') : $pengeluaran->sum('nominal'),
+            'surplus'          => $pemasukan->sum('nominal') - $pengeluaran->sum('nominal'),
+        ]);
     }
 
-    // ============================================================
-    // HELPER — Hitung DP sesuai paket
-    // ============================================================
-    private function hitungDp(string $paket): int
+    public function tambahManual(Request $request)
     {
-        if (stripos($paket, 'Intimate Wedding') !== false) return 1000000;
-        if (stripos($paket, 'Wedding') !== false)         return 3000000;
-        if (stripos($paket, 'Akad') !== false)            return 1000000;
-        return 2000000;
+        // 1. Simpan data transaksi ke tabel transaksis
+        $transaksi = Transaksi::create([
+            'tanggal'      => $request->tanggal,
+            'jenis'        => $request->jenis,
+            'kategori_id'  => $request->kategori_id,
+            'reservasi_id' => $request->reservasi_id, 
+            'nominal'      => $request->nominal,
+            'keterangan'   => $request->keterangan ?? 'Transaksi Manual',
+            'sumber'       => 'manual',
+        ]);
+
+        $pesanTambahan = '';
+
+        // 2. Logika Pelunasan / Cicilan
+        if ($request->filled('reservasi_id')) {
+            $rsv = Reservasi::with('transaksis')->find($request->reservasi_id);
+            
+            if ($rsv) {
+                $totalDibayar = $rsv->transaksis->where('jenis', 'pemasukan')->sum('nominal');
+                $grandTotal = $rsv->grand_total; 
+                
+                if ($totalDibayar >= $grandTotal) {
+                    $rsv->update([
+                        'status_dp' => 'lunas',
+                        'status'    => 'Lunas' 
+                    ]);
+                    $pesanTambahan = ' (Pembayaran LUNAS sepenuhnya).';
+                } else {
+                    $sisa = $grandTotal - $totalDibayar;
+                    $pesanTambahan = ' (Pembayaran masuk, sisa tagihan: Rp ' . number_format($sisa, 0, ',', '.') . ').';
+                }
+            }
+        }
+
+        return back()->with('success', 'Transaksi manual berhasil dicatat! ' . $pesanTambahan);
+    }
+
+    public function tambahKategori(Request $request)
+    {
+        KategoriKeuangan::create($request->all());
+        return back()->with('success', 'Kategori berhasil ditambah.');
+    }
+
+    public function hapusKategori($id)
+    {
+        KategoriKeuangan::findOrFail($id)->delete();
+        return back()->with('success', 'Kategori berhasil dihapus.');
     }
 }

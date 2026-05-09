@@ -30,7 +30,7 @@
     @include('navbar')
     <div class="pt-20 pb-16 text-center">
         <p class="text-2xl md:text-3xl text-green-800/80 mb-4 tracking-wide">
-            ⋄------------- ALL START FROM 7.5K -------------⋄
+            ⋄ ALL START FROM 7.500k ⋄ 
         </p>
         <div class="h-1 w-12 bg-green-200 mx-auto rounded-full"></div>
     </div>

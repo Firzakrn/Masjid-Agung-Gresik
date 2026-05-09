@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 
-
 class AuthController extends Controller
 {
     // === FUNGSI DAFTAR (REGISTER) ===
     public function register(Request $request)
     {
-        // 1. Validasi input dari form HTML
         $request->validate([
             'USER_NAME' => 'required|string|max:255',
             'USER_EMAIL' => 'required|string|email|unique:users,email',
@@ -23,7 +21,6 @@ class AuthController extends Controller
             'USER_GENDER' => 'required|in:L,P',
         ]);
 
-        // 2. Simpan ke database & otomatis HASH password
         $user = User::create([
             'name' => $request->USER_NAME,
             'email' => $request->USER_EMAIL,
@@ -37,56 +34,69 @@ class AuthController extends Controller
         return redirect()->route('login')->with('cek_email', 'Alhamdulillah, akun berhasil dibuat! Silakan cek kotak masuk Email Anda untuk mengaktifkan akun sebelum Masuk.');
     }
 
-    // === LOGIN ===
+    // === LOGIN (SUDAH DIPERBAIKI) ===
     public function login(Request $request)
     {
-        // 1. Validasi input
+        // 1. Cek cerdas: Apakah form mengirim ADMIN_EMAIL atau USER_EMAIL?
+        $emailName = $request->has('ADMIN_EMAIL') ? 'ADMIN_EMAIL' : 'USER_EMAIL';
+        $passwordName = $request->has('ADMIN_PASSWORD') ? 'ADMIN_PASSWORD' : 'USER_PASSWORD';
+
+        // 2. Validasi input yang masuk
         $request->validate([
-            'USER_EMAIL' => 'required|email',
-            'USER_PASSWORD' => 'required',
+            $emailName => 'required|email',
+            $passwordName => 'required',
         ]);
 
-        // 2. Proses Login
         $credentials = [
-            'email' => $request->USER_EMAIL,
-            'password' => $request->USER_PASSWORD
+            'email' => $request->$emailName,
+            'password' => $request->$passwordName
         ];
 
-        // mengecek Hash password di database
+        // 3. Cek database: Apakah email & password benar?
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+            $user = Auth::user();
+            $loginLewatAdmin = $request->is('admin*'); // Ngecek URL apakah ada kata 'admin'
 
-        
-            if (Auth::user()->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
+            // Pengecekan Murni Berdasarkan Kolom 'role' di Database
+            if ($user->role === 'admin' && !$loginLewatAdmin) {
+                Auth::logout();
+                return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
             }
 
-            $nama = Auth::user()->name;
-            return redirect()->intended('/')->with('welcome', "Selamat datang, $nama!");
+            if ($user->role === 'jamaah' && $loginLewatAdmin) {
+                Auth::logout();
+                return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
+            }
+
+            // Jika lolos semua, arahkan ke kamarnya masing-masing
+            $request->session()->regenerate();
+
+            if ($user->role === 'admin') {
+                return redirect('/admin/dashboard');
+            }
+
+            return redirect()->intended('/')->with('welcome', "Selamat datang, {$user->name}!");
         }
 
-        // Jika salah email/password
+        // Jika email/password memang salah
         return back()->withErrors([
-            'USER_EMAIL' => 'Email atau password yang Anda masukkan tidak sesuai.',
-        ])->onlyInput('USER_EMAIL');
+            $emailName => 'Email atau password yang Anda masukkan tidak sesuai.',
+        ])->onlyInput($emailName);
     }
 
+    // === FUNGSI RESET PASSWORD ===
     public function sendResetLink(Request $request)
     {
-        // Validasi input email
         $request->validate(['USER_EMAIL' => 'required|email']);
 
-        // Menggunakan sistem bawaan Laravel untuk mencari email dan mengirim link reset
         $status = Password::sendResetLink(
             ['email' => $request->USER_EMAIL]
         );
 
         if ($status === Password::RESET_LINK_SENT) {
-            // Jika berhasil, kembali dengan pesan sukses
             return back()->with('status', 'Link reset password telah dikirim ke email Anda!');
         }
 
-        // Jika email tidak terdaftar
         return back()->withErrors(['USER_EMAIL' => 'Email tidak ditemukan di sistem kami.']);
     }
 

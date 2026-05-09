@@ -7,13 +7,55 @@ use App\Models\Reservasi;
 use Illuminate\Support\Facades\Auth;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Midtrans\CoreApi; // Pastikan import ini di atas
 
 class ReservasiController extends Controller
 {
     public function tanggalSesi(Request $request)
     {
         $paket = $request->query('paket', 'Paket Belum Dipilih');
-        return view('reservasi.konfirmasi.tgl-sesi', compact('paket'));
+
+        // 1. Ambil semua reservasi dari database (kecuali yang dibatalkan)
+        // Pastikan model Reservasi sudah di-import di atas: use App\Models\Reservasi;
+        $reservasis = Reservasi::where('status', '!=', 'Batal')->get();
+
+        $bookedDates = [];
+
+        // Kamus untuk menerjemahkan bulan Indonesia ke angka
+        $bulanIndo = [
+            'Januari' => '01', 'Februari' => '02', 'Maret' => '03', 'April' => '04',
+            'Mei' => '05', 'Juni' => '06', 'Juli' => '07', 'Agustus' => '08',
+            'September' => '09', 'Oktober' => '10', 'November' => '11', 'Desember' => '12'
+        ];
+
+        foreach ($reservasis as $rsv) {
+            // 2. Ubah format "28 Mei 2026" menjadi "2026-05-28"
+            $parts = explode(' ', $rsv->tanggal);
+            if(count($parts) === 3) {
+                $day = str_pad($parts[0], 2, '0', STR_PAD_LEFT);
+                $month = $bulanIndo[$parts[1]] ?? '01';
+                $year = $parts[2];
+                $tglFormatted = "$year-$month-$day";
+
+                // 3. Cek apakah dia pesan sesi Pagi atau Malam
+                $sesiLokal = strtolower($rsv->sesi);
+                $jenisSesi = str_contains($sesiLokal, 'malam') ? 'malam' : 'pagi';
+
+                // 4. Jika tanggal sudah ada di array (misal sudah ada yang booking Pagi)
+                if (isset($bookedDates[$tglFormatted])) {
+                    // Kalau beda sesi, berarti tanggal itu jadi 'full'
+                    if ($bookedDates[$tglFormatted] !== $jenisSesi) {
+                        $bookedDates[$tglFormatted] = 'full';
+                    }
+                } else {
+                    // Masukkan data baru
+                    $bookedDates[$tglFormatted] = $jenisSesi;
+                }
+            }
+        }
+
+        // 5. Lempar data $bookedDates ke halaman Blade tgl-sesi
+        return view('reservasi.konfirmasi.tgl-sesi', compact('paket', 'bookedDates'));
     }
 
     public function formReservasi(Request $request)
@@ -38,6 +80,39 @@ class ReservasiController extends Controller
         return view('reservasi.konfirmasi.pembayaran', compact('reservasi', 'harga', 'dp'));
     }
 
+    public function getQrCode($id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+        $this->configureMidtrans();
+
+        $params = [
+            'payment_type' => 'qris', // Paksa jenisnya QRIS
+            'transaction_details' => [
+                'order_id'     => 'RSV-' . $reservasi->id . '-' . time(),
+                'gross_amount' => $reservasi->nominal_dp,
+            ],
+            // ... data customer lainnya sama seperti sebelumnya
+        ];
+
+        try {
+            // PAKAI CoreApi, bukan Snap!
+            $response = CoreApi::charge($params);
+
+            // Cari URL QR Code di dalam array actions
+            $qrCodeUrl = null;
+            foreach ($response->actions as $action) {
+                if ($action->name == 'generate-qr-code') {
+                    $qrCodeUrl = $action->url;
+                    break;
+                }
+            }
+
+            return view('reservasi.bayar_qris', compact('qrCodeUrl', 'reservasi'));
+            
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
     // --------------------------------------------------------
     // Submit form reservasi → simpan ke DB → redirect ke pembayaran
     // --------------------------------------------------------
@@ -101,15 +176,39 @@ class ReservasiController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
-            [, $dp] = $this->hitungHargaDp($reservasi->paket);
+            // 1. Ambil Harga Paket dan DP
+            [$hargaPaket, $dp] = $this->hitungHargaDp($reservasi->paket);
+            
+            // 2. Tangkap total fasilitas dari frontend
             $totalFasilitas = (int) request('total_fasilitas', 0);
+
+            // 3. Hitung Grand Total (Harga Paket + Total Fasilitas)
+            $grandTotal = $hargaPaket + $totalFasilitas;
+
+            // 4. SIMPAN ke nama kolom yang BENAR sesuai database kamu
+            $reservasi->update([
+                'total_fasilitas' => $totalFasilitas,
+                'grand_total'     => $grandTotal, 
+                'nominal_dp'      => $dp 
+            ]);
 
             $this->configureMidtrans();
 
             $params = [
+                'enabled_payments' => [
+                    'qris',
+                    'gopay',
+                    'shopeepay',
+                    'bca_va',
+                    'bni_va',
+                    'bri_va',
+                    'mandiri_va'
+                ],
+                // ----------------------------
+
                 'transaction_details' => [
                     'order_id'     => 'RSV-' . $reservasi->id . '-' . time(),
-                    'gross_amount' => $dp + $totalFasilitas,
+                    'gross_amount' => $dp, 
                 ],
                 'customer_details' => [
                     'first_name' => $reservasi->nama_pemohon,
@@ -121,13 +220,7 @@ class ReservasiController extends Controller
                         'price'    => $dp,
                         'quantity' => 1,
                         'name'     => 'DP Reservasi: ' . $reservasi->paket,
-                    ],
-                    ...($totalFasilitas > 0 ? [[
-                        'id'       => 'FASILITAS-' . $reservasi->id,
-                        'price'    => $totalFasilitas,
-                        'quantity' => 1,
-                        'name'     => 'Fasilitas Tambahan',
-                    ]] : []),
+                    ]
                 ],
                 'callbacks' => [
                     'finish'       => route('reservasi.selesai', $reservasi->id),
@@ -137,6 +230,7 @@ class ReservasiController extends Controller
 
             $snapToken = \Midtrans\Snap::getSnapToken($params);
             $reservasi->update(['snap_token' => $snapToken]);
+            
             return response()->json(['snap_token' => $snapToken]);
 
         } catch (\Exception $e) {

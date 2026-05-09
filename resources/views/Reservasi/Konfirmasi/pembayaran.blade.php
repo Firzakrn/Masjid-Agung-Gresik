@@ -94,25 +94,25 @@
                     </div>
                 </div>
 
-                {{-- BLOK TOMBOL BAYAR MIDTRANS --}}
+                {{-- BLOK TOMBOL BAYAR MIDTRANS & MANUAL --}}
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10">
-                    <h2 class="text-xl font-bold text-slate-800 mb-2">Metode Pembayaran DP</h2>
-                    <p class="text-sm text-slate-500 mb-6">Pembayaran diproses secara aman melalui Midtrans. Tersedia Transfer Bank, QRIS, GoPay, OVO, dan lainnya.</p>
+                    
+                    {{-- OPSI 1: MIDTRANS OTOMATIS --}}
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 1: Pembayaran Otomatis</h2>
+                    <p class="text-sm text-slate-500 mb-6">Diproses seketika via Midtrans (Tersedia Transfer Bank, E-Wallet, Kartu Kredit).</p>
 
                     {{-- Logo metode pembayaran --}}
-                    <div class="flex flex-wrap gap-3 mb-8">
-                        <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-600">Transfer Bank</span>
-                        <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-600">QRIS</span>
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-600">Virtual Account</span>
                         <span class="px-3 py-1 bg-green-100 rounded-lg text-xs font-semibold text-green-700">GoPay</span>
                         <span class="px-3 py-1 bg-purple-100 rounded-lg text-xs font-semibold text-purple-700">OVO</span>
-                        <span class="px-3 py-1 bg-blue-100 rounded-lg text-xs font-semibold text-blue-700">BCA Virtual Account</span>
-                        <span class="px-3 py-1 bg-orange-100 rounded-lg text-xs font-semibold text-orange-700">Mandiri</span>
+                        <span class="px-3 py-1 bg-blue-100 rounded-lg text-xs font-semibold text-blue-700">ShopeePay</span>
                     </div>
 
                     {{-- Alert error --}}
                     <div x-show="errorMsg" x-cloak class="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm" x-text="errorMsg"></div>
 
-                    <div class="flex justify-between items-center pt-6 border-t border-slate-200">
+                    <div class="flex justify-between items-center mb-8">
                         <a href="{{ url()->previous() }}" class="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-600 transition">
                             <i class="fa-solid fa-chevron-left text-xl"></i> Kembali
                         </a>
@@ -122,9 +122,9 @@
                             type="button"
                             @click="bayarMidtrans()"
                             :disabled="loading"
-                            class="bg-green-600 text-white font-bold py-4 px-8 rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                            class="bg-green-600 text-white font-bold py-3 px-6 rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            <span x-show="!loading">Bayar Sekarang <i class="fa-solid fa-lock ml-1"></i></span>
+                            <span x-show="!loading">Bayar Otomatis <i class="fa-solid fa-bolt ml-1"></i></span>
                             <span x-show="loading" class="flex items-center gap-2">
                                 <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
                                 Memproses...
@@ -132,9 +132,58 @@
                         </button>
                     </div>
 
-                    <p class="text-xs text-slate-400 mt-4 text-center">
+                    {{-- OPSI 2: QRIS STATIS MASJID --}}
+                    <div class="pt-8 border-t border-slate-200">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 2: Transfer Manual / QRIS Masjid</h2>
+                        <p class="text-sm text-slate-500 mb-6">Jika opsi otomatis bermasalah, silakan transfer ke rekening masjid atau scan QRIS di bawah ini.</p>
+                        
+                        <div class="flex flex-col md:flex-row gap-6 items-center bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                            <!-- GAMBAR QRIS STATIS & TOMBOL DOWNLOAD -->
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+                                    <img src="{{ asset('images/qris.jpeg') }}" alt="QRIS Masjid Agung Gresik" class="w-40 h-40 object-cover rounded-lg">
+                                </div>
+                                <!-- Tombol Download QRIS -->
+                                <a href="{{ asset('images/qris.jpeg') }}" download="QRIS_Masjid_Agung_Gresik.png" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-full transition flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Download QRIS
+                                </a>
+                            </div>
+                            
+                            <!-- INSTRUKSI MANUAL & TOMBOL WA -->
+                            <div class="flex-1 w-full">
+                                <p class="text-sm text-slate-700 font-bold mb-2">Instruksi Pembayaran Manual:</p>
+                                <ul class="list-decimal list-inside text-sm text-slate-600 space-y-1 mb-4">
+                                    <li>Buka aplikasi m-Banking / E-Wallet Anda.</li>
+                                    <li>Scan QRIS di samping atau hasil download.</li>
+                                    <li>Masukkan nominal tepat: <span class="font-bold text-green-700">Rp {{ number_format($dp, 0, ',', '.') }}</span></li>
+                                    <li>Kirim bukti transfer ke WhatsApp Admin.</li>
+                                </ul>
+
+                                <!-- Tombol Konfirmasi WA -->
+                                @php
+                                    // Nomor WA Admin (gunakan kode negara 62 tanpa + atau 0)
+                                    $noWaAdmin = "6281216978686"; 
+                                    
+                                    // Pesan yang sudah di-format otomatis
+                                    $pesanWa = "Assalamualaikum Admin,\nSaya ingin konfirmasi pembayaran DP Reservasi.\n\n*Nama:* " . $reservasi->nama_pemohon . "\n*Paket:* " . $reservasi->paket . "\n*Tanggal Acara:* " . $reservasi->tanggal . "\n*Nominal:* Rp " . number_format($dp, 0, ',', '.') . "\n\nBerikut saya lampirkan bukti transfernya.";
+                                    $linkWa = "https://wa.me/" . $noWaAdmin . "?text=" . urlencode($pesanWa);
+                                @endphp
+
+                                <a href="{{ $linkWa }}" target="_blank" onclick="tutupOtomatis()" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold py-2.5 px-5 rounded-xl transition shadow-md shadow-green-200 mb-4">
+                                    <i class="fa-brands fa-whatsapp text-lg"></i> Konfirmasi via WhatsApp
+                                </a>
+
+                                <div class="bg-blue-50 text-blue-700 text-xs p-3 rounded-lg border border-blue-100 flex gap-2 items-start mt-2">
+                                    <i class="fa-solid fa-circle-info mt-0.5"></i>
+                                    <p>Setelah Admin mengecek bukti transfer dan menekan tombol ACC, halaman ini akan otomatis berpindah (Jangan di-refresh).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-400 mt-8 text-center">
                         <i class="fa-solid fa-shield-halved mr-1"></i>
-                        Pembayaran aman & terenkripsi oleh Midtrans
+                        Semua transaksi tercatat resmi dalam sistem keuangan Masjid Agung Gresik.
                     </p>
                 </div>
             </div>
@@ -292,6 +341,15 @@
         }, 3000);
 
         setTimeout(() => clearInterval(polling), 15 * 60 * 1000);
+
+        // ─── FUNGSI UNTUK TUTUP HALAMAN SETELAH KLIK WA ───
+        function tutupOtomatis() {
+            // Beri jeda 1.5 detik agar tab WhatsApp sempat terbuka dengan aman
+            // Lalu arahkan halaman ini ke route 'selesai'
+            setTimeout(() => {
+                window.location.href = '{{ route("reservasi.selesai", $reservasi->id) }}';
+            }, 1500);
+        }
     </script>
 </body>
 </html>

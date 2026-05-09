@@ -329,12 +329,8 @@
                 selectedDate: null,
                 selectedSession: null,
                 
-                // Data simulasi tanggal yang sudah dibooking.
-                bookedDates: {
-                    '2026-05-15': 'pagi',   // Kuning (Sisa Malam)
-                    '2026-05-20': 'malam',  // Biru (Sisa Pagi)
-                    '2026-05-25': 'full'    // Merah (Penuh)
-                },
+                // Ambil data asli langsung dari Controller Laravel
+                bookedDates: @json($bookedDates ?? (object)[]),
 
                 initCalendar() {
                     let today = new Date();

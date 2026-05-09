@@ -71,6 +71,55 @@
                 </form>
             </div>
 
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <h3 class="text-lg font-bold text-gray-800">Antrean Reservasi Terbaru</h3>
+                    <a href="{{ route('admin.pencatatan') }}" class="text-sm text-green-600 hover:underline">Kelola Keuangan</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-4 font-bold">Pemohon</th>
+                                <th class="px-6 py-4 font-bold">Acara</th>
+                                <th class="px-6 py-4 font-bold">Nominal DP</th>
+                                <th class="px-6 py-4 font-bold">Tanggal Input</th>
+                                <th class="px-6 py-4 font-bold text-right">Status DP</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($antreanDp as $rsv)
+                            <tr class="hover:bg-green-50/50 transition">
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-gray-800">{{ $rsv->nama_pemohon }}</p>
+                                    <p class="text-[10px] text-gray-400">#RSV-{{ $rsv->id }}</p>
+                                </td>
+                                <td class="px-6 py-4 font-semibold text-gray-700">{{ $rsv->paket }}</td>
+                                <td class="px-6 py-4 text-green-600 font-bold">Rp {{ number_format($rsv->nominal_dp, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-gray-400">{{ $rsv->created_at->diffForHumans() }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    @if($rsv->status_dp === 'lunas')
+                                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Lunas</span>
+                                    @elseif($rsv->status_dp === 'menunggu')
+                                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">Menunggu</span>
+                                    @else
+                                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">Gagal</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-400">
+                                    <i class="fa-solid fa-inbox text-2xl mb-2 block"></i>
+                                    Belum ada antrean reservasi masuk.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="mb-8">
                 <div class="flex justify-between items-end mb-4">
                     <h3 class="text-lg font-bold text-gray-800">Publikasi Terbaru</h3>
@@ -110,47 +159,6 @@
                     @endif
                 </div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h3 class="text-lg font-bold text-gray-800">Aktivitas Pencatatan Terakhir</h3>
-                    <a href="#" class="text-sm text-green-600 hover:underline">Kelola Data</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-600">
-                        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-                            <tr>
-                                <th class="px-6 py-4 font-bold">Waktu</th>
-                                <th class="px-6 py-4 font-bold">Jenis Pencatatan</th>
-                                <th class="px-6 py-4 font-bold">Keterangan</th>
-                                <th class="px-6 py-4 font-bold">Tipe User</th>
-                                <th class="px-6 py-4 font-bold text-right">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <tr class="hover:bg-green-50/50 transition">
-                                <td class="px-6 py-4 whitespace-nowrap">Hari ini, 10:45 WIB</td>
-                                <td class="px-6 py-4 font-semibold text-gray-800">Infaq QRIS</td>
-                                <td class="px-6 py-4 truncate max-w-xs">Masuk dana sebesar Rp 150.000 (Dummy Data)</td>
-                                <td class="px-6 py-4">Hamba Allah</td>
-                                <td class="px-6 py-4 text-right">
-                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Berhasil</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-green-50/50 transition">
-                                <td class="px-6 py-4 whitespace-nowrap">Hari ini, 09:12 WIB</td>
-                                <td class="px-6 py-4 font-semibold text-gray-800">DP Reservasi</td>
-                                <td class="px-6 py-4 truncate max-w-xs">Masuk dana sebesar Rp 1.000.000 untuk Intimate Wedding</td>
-                                <td class="px-6 py-4">Jamaah Terdaftar</td>
-                                <td class="px-6 py-4 text-right">
-                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Pending</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div> 
     </main>
 </body>

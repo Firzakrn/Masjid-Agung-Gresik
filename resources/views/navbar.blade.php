@@ -67,8 +67,8 @@
                     <div class="absolute left-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="py-2">
                             <a href="{{ url('/infaq/pencatatan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Catatan Keuangan Masjid</a>
-                            <a href="{{ url('/infaq/zakat') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Zakat</a>
-                            <a href="{{ url('/infaq/infaq') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Infaq & Sedekah</a>
+                            <a href="{{ url('/infaq/edZakat') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Zakat</a>
+                            <a href="{{ url('/infaq/edInfaq') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Infaq & Sedekah</a>
                         </div>
                     </div>
                 </div>
@@ -86,6 +86,11 @@
                         
                         <div class="absolute right-0 top-full mt-0 w-48 bg-white border border-gray-100 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                             <div class="py-2">
+                                @if(Auth::user()->role == 'admin')
+                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-green-700 font-bold hover:bg-green-100 hover:text-green-800 border-b border-gray-50">
+                                        Dashboard Admin
+                                    </a>
+                                @endif
                                 <a href="{{ url('/riwayat') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">Riwayat</a>
                                 
                                 <form action="{{ route('logout') }}" method="POST" class="block w-full text-left m-0">
@@ -148,8 +153,8 @@
                 </button>
                 <div x-show="openZis" x-collapse style="display: none;" class="pl-5 space-y-1">
                     <a href="{{ url('/infaq/pencatatan') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Catatan Keuangan Masjid</a>
-                    <a href="{{ url('/infaq/zakat') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Zakat</a>
-                    <a href="{{ url('/infaq/infaq') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Infaq & Sedekah</a>
+                    <a href="{{ url('/infaq/edZakat') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Zakat</a>
+                    <a href="{{ url('/infaq/edInfaq') }}" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Infaq & Sedekah</a>
                 </div>
             </div>
 
@@ -174,6 +179,11 @@
                         <div x-show="userMenuOpen" 
                             x-collapse 
                             class="mt-2 bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            @if(Auth::user()->role == 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="block px-5 py-3 text-sm font-bold text-green-700 hover:bg-green-100 transition border-b border-gray-100">
+                                    Dashboard Admin
+                                </a>
+                            @endif
                             <a href="{{ url('/riwayat') }}" class="block px-5 py-3 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-green-50 transition">
                                 <i class="fa-solid fa-receipt mr-2 w-5"></i> Riwayat
                             </a>

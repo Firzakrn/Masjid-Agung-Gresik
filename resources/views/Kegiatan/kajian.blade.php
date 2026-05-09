@@ -1,8 +1,3 @@
-@php
-$kajianKitab = $kajianKitab ?? collect();
-$kajianRutin = $kajianRutin ?? collect();
-@endphp
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,76 +7,224 @@ $kajianRutin = $kajianRutin ?? collect();
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Variabel warna hijau untuk Kajian */
+            --hijau-kajian: #059669; /* Emerald 600 */
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .swiper-pagination-bullet-active {
+            background-color: var(--hijau-kajian) !important;
+            width: 24px !important;
+            border-radius: 999px !important;
+        }
+        .swiper-pagination-bullet {
+            transition: all 0.3s ease;
+        }
+        
+        .glass-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body class="bg-slate-50 flex flex-col min-h-screen text-slate-800">
+    
     @include('navbar')
 
-    <main class="flex-grow max-w-7xl mx-auto px-4 py-12 w-full overflow-hidden">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-green-800 mb-2">Jadwal Kajian</h1>
-            <p class="text-gray-600">Tingkatkan ilmu agama melalui kajian kitab dan rutin bersama asatidz.</p>
+    <!-- HERO SECTION KHUSUS KAJIAN -->
+    <div class="w-full bg-gradient-to-br from-[#059669] to-emerald-400 py-16 md:py-24 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-80 h-80 bg-emerald-900 opacity-20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
+        
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <span class="glass-badge text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-lg inline-block mb-4">
+                <i class="fa-solid fa-book-open mr-1"></i> Majelis Ilmu
+            </span>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-md">Kajian & Keilmuan</h1>
+            <p class="text-emerald-50 text-lg max-w-2xl mx-auto opacity-90">Mari tingkatkan keimanan dan ketaqwaan melalui majelis ilmu yang rutin diselenggarakan di Masjid Agung Gresik.</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-16 w-full overflow-hidden -mt-8 relative z-20">
+        
+        <!-- ================= SECTION KAJIAN KITAB ================= -->
+        <div class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-2 h-8 bg-[#059669] rounded-full"></div>
+                <h2 class="text-3xl font-extrabold text-slate-800">Kajian Kitab</h2>
+            </div>
+            
+            <div class="swiper kitabSwiper w-full !pb-12">
+                <div class="swiper-wrapper">
+                    
+                    @forelse($kajianKitab as $item)
+                        <div class="swiper-slide h-auto">
+                            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group hover:shadow-xl transition-all duration-300">
+                                
+                                <!-- Image wrapper -->
+                                <div class="relative h-56 overflow-hidden bg-slate-200">
+                                    <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?q=80&w=1170&auto=format&fit=crop' }}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                         alt="{{ $item->judul }}">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    
+                                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-center rounded-xl px-3 py-1.5 shadow-lg border border-white/50">
+                                        <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-wide"><i class="fa-solid fa-book-quran mr-1"></i> Rutinan</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        @if($item->waktu_acara)
+                                        <div class="flex items-center gap-2 text-xs font-bold text-[#059669] bg-emerald-50 px-3 py-1.5 rounded-lg w-max">
+                                            <i class="fa-regular fa-clock"></i> {{ \Carbon\Carbon::parse($item->waktu_acara)->format('H:i') }} WIB
+                                        </div>
+                                        @endif
+                                        <div class="flex items-center gap-2 text-xs font-bold text-[#059669] bg-emerald-50 px-3 py-1.5 rounded-lg w-max">
+                                            <i class="fa-solid fa-users"></i> Terbuka Umum
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-[#059669] transition-colors line-clamp-2">
+                                        {{ $item->judul }}
+                                    </h3>
+                                    
+                                    <p class="text-slate-600 text-sm line-clamp-3 mb-6">
+                                        {{ $item->isi_konten ?? 'Mari hadiri kajian kitab ini untuk memperdalam pemahaman agama dan menyambung tali silaturahmi sesama jamaah.' }}
+                                    </p>
+                                    
+                                    <div class="mt-auto">
+                                        <a href="{{ route('kegiatan.detail', $item->id) }}" class="block text-center w-full py-3 bg-emerald-50 text-[#059669] hover:bg-[#059669] hover:text-white font-bold rounded-xl transition border border-emerald-200 hover:border-transparent">
+                                            Lihat Detail Kajian
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    @empty
+                        <div class="w-full p-8 text-center bg-white rounded-3xl border border-slate-200 shadow-sm col-span-full">
+                            <i class="fa-solid fa-book-open text-5xl text-slate-300 mb-4"></i>
+                            <p class="text-slate-500 font-medium">Belum ada Kajian Kitab yang dijadwalkan saat ini.</p>
+                        </div>
+                    @endforelse
+
+                </div>
+                <div class="swiper-pagination kitab-pagination"></div>
+            </div>
         </div>
 
-        <h2 class="text-2xl font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Kajian Kitab</h2>
-        <div class="swiper kajianSwiper w-full py-4 mb-10">
-            <div class="swiper-wrapper">
-                @forelse($kajianKitab as $item)
-                <div class="swiper-slide">
-                    <div class="relative bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full group">
-                        <a href="{{ route('berita.show', $item->id) }}">
-                            <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/800x500' }}" 
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform">
-                        </a>
-                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3 text-sm">
-                            {{ $item->judul }}
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <p class="text-gray-500">Belum ada kajian kitab.</p>
-                @endforelse
+        <!-- ================= SECTION KAJIAN RUTIN ================= -->
+        <div class="mb-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-2 h-8 bg-[#059669] rounded-full"></div>
+                <h2 class="text-3xl font-extrabold text-slate-800">Kajian Rutin</h2>
             </div>
-            <div class="swiper-pagination !relative !mt-6"></div>
+            
+            <div class="swiper rutinSwiper w-full !pb-12">
+                <div class="swiper-wrapper">
+                    
+                    @forelse($kajianRutin as $item)
+                        <div class="swiper-slide h-auto">
+                            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group hover:shadow-xl transition-all duration-300">
+                                
+                                <!-- Image wrapper -->
+                                <div class="relative h-56 overflow-hidden bg-slate-200">
+                                    <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1176&auto=format&fit=crop' }}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                         alt="{{ $item->judul }}">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    
+                                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-center rounded-xl px-3 py-1.5 shadow-lg border border-white/50">
+                                        <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-wide"><i class="fa-solid fa-calendar-check mr-1"></i> Tematik</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        @if($item->waktu_acara)
+                                        <div class="flex items-center gap-2 text-xs font-bold text-[#059669] bg-emerald-50 px-3 py-1.5 rounded-lg w-max">
+                                            <i class="fa-regular fa-clock"></i> {{ \Carbon\Carbon::parse($item->waktu_acara)->format('H:i') }} WIB
+                                        </div>
+                                        @endif
+                                        <div class="flex items-center gap-2 text-xs font-bold text-[#059669] bg-emerald-50 px-3 py-1.5 rounded-lg w-max">
+                                            <i class="fa-solid fa-mosque"></i> Terbuka Umum
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-[#059669] transition-colors line-clamp-2">
+                                        {{ $item->judul }}
+                                    </h3>
+                                    
+                                    <p class="text-slate-600 text-sm line-clamp-3 mb-6">
+                                        {{ $item->isi_konten ?? 'Kajian rutin tematik yang diselenggarakan untuk menjawab persoalan umat dan meningkatkan pemahaman keagamaan.' }}
+                                    </p>
+                                    
+                                    <div class="mt-auto">
+                                        <a href="{{ route('kegiatan.detail', $item->id) }}" class="block text-center w-full py-3 bg-emerald-50 text-[#059669] hover:bg-[#059669] hover:text-white font-bold rounded-xl transition border border-emerald-200 hover:border-transparent">
+                                            Lihat Detail Kajian
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    @empty
+                        <div class="w-full p-8 text-center bg-white rounded-3xl border border-slate-200 shadow-sm col-span-full">
+                            <i class="fa-solid fa-folder-open text-5xl text-slate-300 mb-4"></i>
+                            <p class="text-slate-500 font-medium">Belum ada Kajian Rutin yang dijadwalkan saat ini.</p>
+                        </div>
+                    @endforelse
+
+                </div>
+                <div class="swiper-pagination rutin-pagination"></div>
+            </div>
         </div>
 
-        <h2 class="text-2xl font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2 mt-8">Kajian Rutin</h2>
-        <div class="swiper kajianSwiper w-full py-4 mb-4">
-            <div class="swiper-wrapper">
-                @forelse($kajianRutin as $item)
-                <div class="swiper-slide">
-                    <div class="relative bg-white rounded-xl shadow-md overflow-hidden h-[400px] w-full group">
-                        <a href="{{ route('berita.show', $item->id) }}">
-                            <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://via.placeholder.com/800x500' }}" 
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform">
-                        </a>
-                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3 text-sm">
-                            {{ $item->judul }}
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <p class="text-gray-500">Belum ada kajian rutin.</p>
-                @endforelse
-            </div>
-            <div class="swiper-pagination !relative !mt-6"></div>
-        </div>
     </main>
 
     @include('footer')
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const swipers = document.querySelectorAll('.kajianSwiper');
-        swipers.forEach(function(swiperElem) {
-            new Swiper(swiperElem, {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                pagination: { el: swiperElem.querySelector('.swiper-pagination'), clickable: true },
-                breakpoints: {
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    1024: { slidesPerView: 4, spaceBetween: 30 },
-                }
-            });
+        // Konfigurasi umum untuk Swiper
+        const swiperConfig = {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            autoplay: { delay: 5000, disableOnInteraction: true },
+            breakpoints: {
+                640: { slidesPerView: 2, spaceBetween: 20 },
+                1024: { slidesPerView: 3, spaceBetween: 30 }, 
+            }
+        };
+
+        // Inisialisasi Swiper Kajian Kitab
+        new Swiper(".kitabSwiper", {
+            ...swiperConfig,
+            pagination: { 
+                el: ".kitab-pagination", 
+                clickable: true,
+                dynamicBullets: true 
+            }
+        });
+
+        // Inisialisasi Swiper Kajian Rutin
+        new Swiper(".rutinSwiper", {
+            ...swiperConfig,
+            pagination: { 
+                el: ".rutin-pagination", 
+                clickable: true,
+                dynamicBullets: true 
+            }
         });
     </script>
 </body>
