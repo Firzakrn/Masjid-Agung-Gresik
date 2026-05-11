@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Reservasi;
-// use App\Models\Zis; // Hapus tanda // jika kamu sudah punya model ZIS/Infaq
+use App\Models\Reservasi;   // inisialisasi model (blueprint tabel db)
 
 class UserController extends Controller
 {
+    // function bisa untuk mengatur pengalihan halaman, 
+    //      validasi input user, letak logika CRUD
     public function riwayat()
     {
         // 1. Tarik riwayat reservasi milik pemohon yang sedang login
@@ -21,5 +22,5 @@ class UserController extends Controller
         $riwayatZis = [];
 
         return view('riwayat', compact('reservasis', 'riwayatZis'));
-    }
+    } 
 }

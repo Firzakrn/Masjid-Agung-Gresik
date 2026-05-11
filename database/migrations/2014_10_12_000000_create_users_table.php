@@ -10,8 +10,9 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    {                  // nama tabel
         Schema::create('users', function (Blueprint $table) {
+            // tipedata ('kolom/atribut'[tambahan syarat])
             $table->id();
             $table->string('name');
             $table->string('email')->unique();

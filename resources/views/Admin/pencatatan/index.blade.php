@@ -11,12 +11,13 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .hide-scroll-bar::-webkit-scrollbar { display: none; }
         .hide-scroll-bar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    </style> <!-- css singkat untuk menyembunyikan scrollbar -->
 </head>
 <body class="bg-slate-100 font-sans flex h-screen overflow-hidden text-slate-800">
 
     @include('admin.navbarAdm')
 
+    <!-- [MAIN CODE] tampilan halaman, header, dan trigger view lainnya -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
         
         <header class="md:hidden bg-green-800 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -169,8 +170,7 @@
                 </div>
             </div>
 
-            <!-- INCLUDES UNTUK VIEW LAINNYA -->
-            {{-- Bagian ini memanggil file blade lain yang ada di folder pencatatan --}}
+            {{-- Includes view memanggil blade lain yang ada di folder pencatatan --}}
             <div id="reserverView" class="view-section hidden w-full transition-all duration-300">
                 @include('admin.pencatatan.reserver')
             </div>
@@ -194,187 +194,185 @@
         </div>
     </main>
 
-    <!-- MODAL STRUK -->
-    <div id="modalStruk" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
-            <button onclick="document.getElementById('modalStruk').style.display='none'"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <div class="text-center mb-6">
-                <i class="fa-solid fa-receipt text-4xl text-green-600 mb-2"></i>
-                <h3 class="text-xl font-bold text-slate-800">Struk Pembayaran DP</h3>
-                <p class="text-xs text-slate-500">#RSV-<span id="struk_id"></span></p>
-            </div>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Nama Pemohon</span>
-                    <span class="font-bold text-slate-800" id="struk_nama"></span>
-                </div>
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Paket Acara</span>
-                    <span class="font-bold text-slate-800" id="struk_paket"></span>
-                </div>
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Tanggal Acara</span>
-                    <span class="font-bold text-slate-800" id="struk_tanggal"></span>
-                </div>
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Sesi</span>
-                    <span class="font-bold text-slate-800" id="struk_sesi"></span>
-                </div>
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Nominal DP</span>
-                    <span class="font-bold text-green-600 text-base" id="struk_nominal"></span>
-                </div>
-                <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Status</span>
-                    <span class="font-bold" id="struk_status"></span>
-                </div>
-                <div class="flex justify-between pb-2">
-                    <span class="text-slate-500">Bukti Bayar</span>
-                    <span class="font-bold text-blue-600" id="struk_bukti"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DETAIL RESERVER (Diperbarui dengan Layout 2 Kolom) -->
-    <div id="modalDetailReserver" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden scale-95 transition-transform duration-300" id="modalDetailContent">
-            
-            <!-- Header Modal -->
-            <div class="bg-slate-800 text-white p-5 flex justify-between items-center flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg leading-tight">Detail Formulir & Pembayaran Reservasi</h3>
-                        <p class="text-xs text-slate-300">Informasi lengkap pemohon, syarat acara, dan pelacakan kas.</p>
-                    </div>
-                </div>
-                <button onclick="tutupModalReserver()" class="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <!-- [MODAL/OVERLAY] kode tambahan untuk tampilan pop up -->
+        <div id="modalStruk" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+                <button onclick="document.getElementById('modalStruk').style.display='none'"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+                    <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
-            </div>
-
-            <!-- Body Modal -->
-            <div class="p-6 overflow-y-auto bg-slate-50 flex-1 hide-scroll-bar">
-                
-                <!-- 4 KOTAK STATUS ATAS -->
-                <div class="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex-1">
-                        <p class="text-[10px] uppercase font-bold text-slate-400">Status Reservasi</p>
-                        <p class="font-bold text-slate-800 text-sm" id="det_status">-</p>
+                <div class="text-center mb-6">
+                    <i class="fa-solid fa-receipt text-4xl text-green-600 mb-2"></i>
+                    <h3 class="text-xl font-bold text-slate-800">Struk Pembayaran DP</h3>
+                    <p class="text-xs text-slate-500">#RSV-<span id="struk_id"></span></p>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Nama Pemohon</span>
+                        <span class="font-bold text-slate-800" id="struk_nama"></span>
                     </div>
-                    <div class="flex-1 border-l border-slate-100 pl-4">
-                        <p class="text-[10px] uppercase font-bold text-slate-400">Status Pembayaran</p>
-                        <p class="font-bold text-sm uppercase" id="det_status_dp">-</p>
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Paket Acara</span>
+                        <span class="font-bold text-slate-800" id="struk_paket"></span>
                     </div>
-                    <div class="flex-1 border-l border-slate-100 pl-4">
-                        <p class="text-[10px] uppercase font-bold text-slate-400">Total Terbayar</p>
-                        <p class="font-bold text-green-600 text-sm" id="det_total_terbayar">-</p>
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Tanggal Acara</span>
+                        <span class="font-bold text-slate-800" id="struk_tanggal"></span>
                     </div>
-                    <div class="flex-1 border-l border-slate-100 pl-4">
-                        <p class="text-[10px] uppercase font-bold text-slate-400">Sisa Tagihan / Kurang</p>
-                        <p class="font-bold text-red-500 text-sm" id="det_sisa_tagihan">-</p>
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Sesi</span>
+                        <span class="font-bold text-slate-800" id="struk_sesi"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Nominal DP</span>
+                        <span class="font-bold text-green-600 text-base" id="struk_nominal"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
+                        <span class="text-slate-500">Status</span>
+                        <span class="font-bold" id="struk_status"></span>
+                    </div>
+                    <div class="flex justify-between pb-2">
+                        <span class="text-slate-500">Bukti Bayar</span>
+                        <span class="font-bold text-blue-600" id="struk_bukti"></span>
                     </div>
                 </div>
-
-                <!-- LAYOUT 2 KOLOM -->
-                <div class="flex flex-col lg:flex-row gap-6">
-                    
-                    <!-- KOLOM KIRI: Data Acara, Pemohon, Dokumen -->
-                    <div class="lg:w-2/3 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h4 class="font-bold text-sm text-blue-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-calendar-check mr-2"></i>Informasi Acara</h4>
-                                <table class="w-full text-sm">
-                                    <tr><td class="py-1.5 text-slate-500 w-1/3">Paket</td><td class="py-1.5 font-semibold text-slate-800" id="det_paket">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500">Tanggal</td><td class="py-1.5 font-semibold text-slate-800" id="det_tanggal">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500">Sesi</td><td class="py-1.5 font-semibold text-slate-800" id="det_sesi">-</td></tr>
-                                </table>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h4 class="font-bold text-sm text-blue-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-user-pen mr-2"></i>Data Pemohon</h4>
-                                <table class="w-full text-sm">
-                                    <tr><td class="py-1.5 text-slate-500 w-1/3">Nama</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_pemohon">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_pemohon">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500 align-top">Alamat</td><td class="py-1.5 font-semibold text-slate-800" id="det_alamat_pemohon">-</td></tr>
-                                </table>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-mars mr-2"></i>Pengantin Pria</h4>
-                                <table class="w-full text-sm">
-                                    <tr><td class="py-1.5 text-slate-500 w-1/3">Nama CPP</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_cpp">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_cpp">-</td></tr>
-                                </table>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-venus mr-2"></i>Pengantin Wanita</h4>
-                                <table class="w-full text-sm">
-                                    <tr><td class="py-1.5 text-slate-500 w-1/3">Nama CPW</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_cpw">-</td></tr>
-                                    <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_cpw">-</td></tr>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- DOKUMEN SYARAT RESERVASI -->
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <h4 class="font-bold text-sm text-purple-600 border-b border-slate-100 pb-2 mb-4"><i class="fa-solid fa-folder-open mr-2"></i>Lampiran Dokumen Persyaratan</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span class="text-xs font-semibold text-slate-700">Surat Rekomendasi KUA</span>
-                                    <div id="doc_kua"></div>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span class="text-xs font-semibold text-slate-700">KTP Pria (CPP)</span>
-                                    <div id="doc_ktp_cpp"></div>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span class="text-xs font-semibold text-slate-700">KTP Wanita (CPW)</span>
-                                    <div id="doc_ktp_cpw"></div>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span class="text-xs font-semibold text-slate-700">Foto Pria 3x4</span>
-                                    <div id="doc_foto_cpp"></div>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span class="text-xs font-semibold text-slate-700">Foto Wanita 3x4</span>
-                                    <div id="doc_foto_cpw"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- KOLOM KANAN: Riwayat Transaksi -->
-                    <div class="lg:w-1/3">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm sticky top-0">
-                            <h4 class="font-bold text-sm text-green-700 border-b border-slate-100 pb-2 mb-4">
-                                <i class="fa-solid fa-money-bill-transfer mr-2"></i>Riwayat Pembayaran Jamaah
-                            </h4>
-                            
-                            <!-- Area Injeksi JS -->
-                            <div id="list_riwayat_transaksi" class="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 hide-scroll-bar">
-                                <!-- List transaksi akan di-generate oleh JS -->
-                            </div>
-
-                            <div class="bg-slate-800 text-white p-4 rounded-xl">
-                                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">TOTAL BIAYA SEWA</p>
-                                <p class="text-xl font-black" id="det_grand_total">Rp 0</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            
-            <div class="p-4 bg-white border-t border-slate-200 flex justify-end items-center">
-                <button onclick="tutupModalReserver()" class="bg-slate-800 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition">Tutup Modal</button>
             </div>
         </div>
-    </div>
+        <div id="modalDetailReserver" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden scale-95 transition-transform duration-300" id="modalDetailContent">
+                
+                <!-- Header Modal -->
+                <div class="bg-slate-800 text-white p-5 flex justify-between items-center flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div>
+                        <div>
+                            <h3 class="font-bold text-lg leading-tight">Detail Formulir & Pembayaran Reservasi</h3>
+                            <p class="text-xs text-slate-300">Informasi lengkap pemohon, syarat acara, dan pelacakan kas.</p>
+                        </div>
+                    </div>
+                    <button onclick="tutupModalReserver()" class="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
 
-    <!-- SCRIPT UTAMA UNTUK NAVIGASI INDEX -->
+                <!-- Body Modal -->
+                <div class="p-6 overflow-y-auto bg-slate-50 flex-1 hide-scroll-bar">
+                    
+                    <!-- 4 KOTAK STATUS ATAS -->
+                    <div class="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex-1">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Status Reservasi</p>
+                            <p class="font-bold text-slate-800 text-sm" id="det_status">-</p>
+                        </div>
+                        <div class="flex-1 border-l border-slate-100 pl-4">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Status Pembayaran</p>
+                            <p class="font-bold text-sm uppercase" id="det_status_dp">-</p>
+                        </div>
+                        <div class="flex-1 border-l border-slate-100 pl-4">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Total Terbayar</p>
+                            <p class="font-bold text-green-600 text-sm" id="det_total_terbayar">-</p>
+                        </div>
+                        <div class="flex-1 border-l border-slate-100 pl-4">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Sisa Tagihan / Kurang</p>
+                            <p class="font-bold text-red-500 text-sm" id="det_sisa_tagihan">-</p>
+                        </div>
+                    </div>
+
+                    <!-- LAYOUT 2 KOLOM -->
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        
+                        <!-- KOLOM KIRI: Data Acara, Pemohon, Dokumen -->
+                        <div class="lg:w-2/3 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-sm text-blue-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-calendar-check mr-2"></i>Informasi Acara</h4>
+                                    <table class="w-full text-sm">
+                                        <tr><td class="py-1.5 text-slate-500 w-1/3">Paket</td><td class="py-1.5 font-semibold text-slate-800" id="det_paket">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500">Tanggal</td><td class="py-1.5 font-semibold text-slate-800" id="det_tanggal">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500">Sesi</td><td class="py-1.5 font-semibold text-slate-800" id="det_sesi">-</td></tr>
+                                    </table>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-sm text-blue-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-user-pen mr-2"></i>Data Pemohon</h4>
+                                    <table class="w-full text-sm">
+                                        <tr><td class="py-1.5 text-slate-500 w-1/3">Nama</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_pemohon">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_pemohon">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500 align-top">Alamat</td><td class="py-1.5 font-semibold text-slate-800" id="det_alamat_pemohon">-</td></tr>
+                                    </table>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-mars mr-2"></i>Pengantin Pria</h4>
+                                    <table class="w-full text-sm">
+                                        <tr><td class="py-1.5 text-slate-500 w-1/3">Nama CPP</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_cpp">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_cpp">-</td></tr>
+                                    </table>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-venus mr-2"></i>Pengantin Wanita</h4>
+                                    <table class="w-full text-sm">
+                                        <tr><td class="py-1.5 text-slate-500 w-1/3">Nama CPW</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_cpw">-</td></tr>
+                                        <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_cpw">-</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- DOKUMEN SYARAT RESERVASI -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <h4 class="font-bold text-sm text-purple-600 border-b border-slate-100 pb-2 mb-4"><i class="fa-solid fa-folder-open mr-2"></i>Lampiran Dokumen Persyaratan</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="text-xs font-semibold text-slate-700">Surat Rekomendasi KUA</span>
+                                        <div id="doc_kua"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="text-xs font-semibold text-slate-700">KTP Pria (CPP)</span>
+                                        <div id="doc_ktp_cpp"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="text-xs font-semibold text-slate-700">KTP Wanita (CPW)</span>
+                                        <div id="doc_ktp_cpw"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="text-xs font-semibold text-slate-700">Foto Pria 3x4</span>
+                                        <div id="doc_foto_cpp"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="text-xs font-semibold text-slate-700">Foto Wanita 3x4</span>
+                                        <div id="doc_foto_cpw"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KOLOM KANAN: Riwayat Transaksi -->
+                        <div class="lg:w-1/3">
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm sticky top-0">
+                                <h4 class="font-bold text-sm text-green-700 border-b border-slate-100 pb-2 mb-4">
+                                    <i class="fa-solid fa-money-bill-transfer mr-2"></i>Riwayat Pembayaran Jamaah
+                                </h4>
+                                
+                                <!-- Area Injeksi JS -->
+                                <div id="list_riwayat_transaksi" class="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 hide-scroll-bar">
+                                    <!-- List transaksi akan di-generate oleh JS -->
+                                </div>
+
+                                <div class="bg-slate-800 text-white p-4 rounded-xl">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">TOTAL BIAYA SEWA</p>
+                                    <p class="text-xl font-black" id="det_grand_total">Rp 0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-white border-t border-slate-200 flex justify-end items-center">
+                    <button onclick="tutupModalReserver()" class="bg-slate-800 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition">Tutup Modal</button>
+                </div>
+            </div>
+        </div>
+
+    <!-- [JAVASCRIPT] logika interaksi di halaman ini -->
     <script>
         const views = {
             accDp: document.getElementById('accDpView'),
@@ -561,7 +559,7 @@
         }
     </script>
 
-    <!-- STACK UNTUK SCRIPT DARI FILE BLADE LAIN -->
+    <!-- [STACK] untuk script dari file BLADE lain -->
     @stack('scripts')
 
 </body>

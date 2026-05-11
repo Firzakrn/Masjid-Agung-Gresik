@@ -9,6 +9,8 @@ class Berita extends Model
 {
     use HasFactory;
 
+    // mengatur apa yg diizinkan untuk diisi
+    // $hidden untuk menyembunyikan data yang tidak ingin ditampilkan
     protected $fillable = [
         'judul', 
         'kategori', 
@@ -16,6 +18,7 @@ class Berita extends Model
         'foto', 
         'isi_konten'
     ];
+    // membuat fungsi filter agar memudahkan di controller
     public function scopeKategori($query, $kategori)
     {
         return $query->where('kategori', $kategori);

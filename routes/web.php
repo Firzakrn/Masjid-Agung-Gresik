@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\MidtransController;
-use App\Models\Pembayaran;
 use App\Models\Berita;
 
 // --- Bagian Home & Berita ----------------
@@ -65,7 +64,7 @@ Route::get('/reservasi/socialevent', function () {
     // Step 1 : tgl & sesi
     Route::get('/reservasi/tgl-sesi', [ReservasiController::class, 'tanggalSesi'])->name('reservasi.tgl');
 
-    // Step 2 : formulir 
+    // middleware : kondisi, get : request data, post : kirim data
     Route::middleware(['auth'])->group(function () {
         Route::get('/reservasi/formulir', [ReservasiController::class, 'formReservasi'])->name('reservasi.formulir');
         Route::post('/reservasi/submit', [ReservasiController::class, 'submit'])->name('reservasi.submit');
