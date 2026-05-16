@@ -44,7 +44,7 @@ class AuthController extends Controller
 
             Auth::login($user);
 
-            return redirect('/')->with('welcome', "Selamat datang, {$user->name}!");
+            return redirect()->intended('/')->with('welcome', "Selamat datang, {$user->name}!");
 
         } catch (\Exception $e) {
             return redirect('/login')->withErrors([
@@ -129,19 +129,8 @@ class AuthController extends Controller
                 return redirect('/admin/dashboard');
             }
 
-            $redirectTo = $request->input('redirect', '/');
-
-            // Ambil hanya path-nya jika berupa URL penuh
-            if (filter_var($redirectTo, FILTER_VALIDATE_URL)) {
-                $redirectTo = parse_url($redirectTo, PHP_URL_PATH);
-                $query = parse_url($request->input('redirect'), PHP_URL_QUERY);
-                if ($query) $redirectTo .= '?' . $query;
-            }
-
-            // Fallback jika kosong
-            if (!$redirectTo) $redirectTo = '/';
-
-            return redirect($redirectTo)->with('welcome', "Selamat datang, {$user->name}!");
+            // Cukup gunakan intended() dengan fallback '/'
+            return redirect()->intended('/')->with('welcome', "Selamat datang, {$user->name}!");
         }
 
         // 7. Jika email/password salah

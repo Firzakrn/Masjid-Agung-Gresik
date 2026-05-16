@@ -9,6 +9,25 @@ use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
+// Halaman "silakan verifikasi email kamu"
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Link verifikasi yang dikirim ke email
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home'); // ganti sesuai route tujuan setelah verified
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Kirim ulang email verifikasi
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link verifikasi telah dikirim!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // ✅ Route admin ZIS tetap di luar auth jamaah (sudah diproteksi is_admin di bawah)
 Route::post('/admin/zis/{id}/acc', [KeuanganController::class, 'accZis'])->name('zis.acc');
@@ -44,6 +63,8 @@ Route::get('/api/laporan-keuangan', [KeuanganController::class, 'laporan'])->nam
 // Reservasi (Publik - hanya halaman info paket, belum butuh login)
 Route::get('/reservasi/wedding', fn() => view('reservasi.wedding'))->name('reservasi.wedding');
 Route::get('/reservasi/socialevent', fn() => view('reservasi.socialevent'))->name('reservasi.socialevent');
+Route::get('/reservasi/tgl-sesi', [ReservasiController::class, 'tanggalSesi'])->name('reservasi.tgl');
+
 
 // Midtrans Webhook (tanpa auth & CSRF)
 Route::post('/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('midtrans.notification');
@@ -71,10 +92,9 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
         BUTUH LOGIN (Jamaah)
    ----------------------------------- */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reservasi
-    Route::get('/reservasi/tgl-sesi', [ReservasiController::class, 'tanggalSesi'])->name('reservasi.tgl');
     Route::get('/reservasi/formulir', [ReservasiController::class, 'formReservasi'])->name('reservasi.formulir');
     Route::post('/reservasi/submit', [ReservasiController::class, 'submit'])->name('reservasi.submit');
     Route::get('/reservasi/pembayaran/{id}', [ReservasiController::class, 'pembayaran'])->name('reservasi.pembayaran');

@@ -66,17 +66,10 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Harga Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
                     </div>
-                    @auth
-                        <a href="{{ route('reservasi.tgl', ['paket' => 'Workshop']) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Workshop'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
+                    <a href="{{ route('reservasi.tgl', ['paket' => 'Workshop']) }}"
+                    class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                        Pilih Paket
+                    </a>
                 </div>
             </div>
 
@@ -127,17 +120,10 @@
                 </div>
 
                 <div class="flex flex-row-reverse items-center gap-6 justify-end">
-                    @auth
-                        <a href="{{ route('reservasi.tgl', ['paket' => 'Wisuda']) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Wisuda'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
+                    <a href="{{ route('reservasi.tgl', ['paket' => 'Wisuda']) }}"
+                    class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                        Pilih Paket
+                    </a>
                     <div class="text-left md:text-right">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Biaya Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
@@ -176,17 +162,10 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Biaya Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
                     </div>
-                    @auth
-                        <a href="{{ route('reservasi.tgl', ['paket' => 'Majelis']) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Majelis'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
+                    <a href="{{ route('reservasi.tgl', ['paket' => 'Majelis']) }}"
+                    class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                        Pilih Paket
+                    </a>
                 </div>
             </div>
 

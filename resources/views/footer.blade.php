@@ -3,6 +3,9 @@
         <div class="flex flex-col md:flex-row justify-between gap-10 items-center md:items-start">
 
             <div class="w-full md:w-1/2 flex flex-col text-center md:text-left items-center md:items-start">
+                <a href="/">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo Masjid Agung Gresik" class="h-14 md:h-16 w-auto transition-transform hover:scale-105 pb-2">
+                </a>
                 <h2 class="text-3xl font-bold mb-3 drop-shadow-sm">Masjid Agung Gresik</h2>
                 <p class="text-sm text-green-100 mb-6 max-w-md leading-relaxed">
                     Jl. Dr. Wahidin Sudirohusodo, Klangonan, Kembangan, Kec. Kebomas, Kabupaten Gresik, Jawa Timur 61124

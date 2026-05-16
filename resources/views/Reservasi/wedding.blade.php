@@ -68,17 +68,10 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Investment</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 12.500.000</p>
                     </div>
-                    @auth
                         <a href="{{ route('reservasi.tgl', ['paket' => 'Wedding']) }}"
                            class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
                             Pilih Paket
                         </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Wedding'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
                 </div>
             </div>
 
@@ -126,17 +119,10 @@
                 </div>
 
                 <div class="flex flex-row-reverse items-center gap-6 justify-end">
-                    @auth
                         <a href="{{ route('reservasi.tgl', ['paket' => 'Intimate Wedding']) }}"
                            class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
                             Pilih Paket
                         </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Intimate Wedding'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
                     <div class="text-left md:text-right">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Investment</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 2.500.000</p>
@@ -174,17 +160,10 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Investment</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 3.000.000</p>
                     </div>
-                    @auth
                         <a href="{{ route('reservasi.tgl', ['paket' => 'Akad Nikah']) }}"
                            class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
                             Pilih Paket
                         </a>
-                    @else
-                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Akad Nikah'])) }}"
-                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                            Pilih Paket
-                        </a>
-                    @endauth
                 </div>
             </div>
 

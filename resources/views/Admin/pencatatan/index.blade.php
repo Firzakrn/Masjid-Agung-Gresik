@@ -468,7 +468,7 @@
             </div>
             
             <div class="p-4 bg-white border-t border-slate-200 flex justify-end items-center">
-                <button onclick="tutupModalReserver()" class="bg-slate-800 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition">Tutup Modal</button>
+                <button onclick="tutupModalReserver()" class="bg-slate-800 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition">Tutup</button>
             </div>
         </div>
     </div>

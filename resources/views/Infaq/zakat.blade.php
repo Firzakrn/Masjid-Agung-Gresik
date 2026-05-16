@@ -222,21 +222,6 @@
                             <img src="{{ asset('images/qris.jpeg') }}" alt="QRIS Masjid Agung Gresik"
                                  class="w-64 h-64 object-contain mx-auto rounded-xl shadow-sm">
                         </div>
-                        <div class="border-t border-slate-100 pt-6 text-left">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Atau Transfer Manual:</p>
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between mb-3">
-                                <div>
-                                    <p class="text-xs text-slate-500 font-semibold mb-1">BSI (Bank Syariah Indonesia)</p>
-                                    <p class="font-mono font-bold text-lg text-slate-800">77 88 99 11 22</p>
-                                    <p class="text-xs text-slate-500">a.n. ZIS Masjid Agung Gresik</p>
-                                </div>
-                                <button type="button" onclick="salinRekening()"
-                                        class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-green-600 hover:border-green-300 flex items-center justify-center transition shadow-sm"
-                                        title="Salin Rekening">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
                         <div class="bg-yellow-50 text-yellow-700 text-xs p-3 rounded-lg flex items-start gap-2 text-left mt-4">
                             <i class="fa-solid fa-circle-info mt-0.5"></i>
                             <p>Setelah transfer, unggah bukti dan tekan tombol <strong>Kirim Pembayaran</strong> agar niat Anda tercatat dengan baik oleh sistem kami.</p>
