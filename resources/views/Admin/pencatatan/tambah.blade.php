@@ -2,14 +2,17 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Catat Transaksi Manual Baru</h2>
         
-        <form action="{{ route('admin.keuangan.tambah') }}" method="POST">
+        {{-- Ubah ke multipart agar bisa upload file bukti --}}
+        <form action="{{ route('admin.keuangan.tambah') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
+            {{-- Tanggal --}}
             <div class="mb-6">
                 <label class="block text-sm font-bold text-slate-700 mb-2">Tanggal Transaksi <span class="text-red-500">*</span></label>
                 <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500" required />
             </div>
             
+            {{-- Jenis Arus Kas --}}
             <div class="mb-6">
                 <label class="block text-sm font-bold text-slate-700 mb-3">Jenis Arus Kas <span class="text-red-500">*</span></label>
                 <div class="flex gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
@@ -22,50 +25,131 @@
                 </div>
             </div>
             
+            {{-- Kategori --}}
             <div class="mb-6">
                 <label class="block text-sm font-bold text-slate-700 mb-2">Kategori <span class="text-red-500">*</span></label>
                 <select name="kategori_id" id="kategori_akun" class="w-full border border-slate-300 px-4 py-3 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-green-500" disabled required>
                     <option value="" disabled selected>Pilih jenis transaksi di atas dulu...</option>
                 </select>
             </div>
-            
-            <!-- KOLOM PILIH RESERVASI -->
-            <div class="mb-6 hidden transition-all duration-300" id="div_pilih_reservasi">
-                <label class="block text-sm font-bold text-slate-700 mb-2 text-blue-600"><i class="fa-solid fa-link mr-1"></i> Hubungkan ke Data Reservasi <span class="text-red-500">*</span></label>
-                
-                <select name="reservasi_id" id="input_reservasi_id" class="w-full border border-slate-300 px-4 py-3 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="" disabled selected data-sisa="0">Pilih data reservasi...</option>
-                    @foreach($semuaReservasi as $rsv)
-                        @php
-                            // 👇 UBAH RUMUS INI JUGA: Murni ambil dari transaksi agar nominal sisa tidak salah
-                            $terbayar = $rsv->transaksis->where('jenis', 'pemasukan')->sum('nominal');
-                            $sisa = max(0, $rsv->grand_total - $terbayar);
-                        @endphp
-                        <option value="{{ $rsv->id }}" data-sisa="{{ $sisa }}">
-                            #RSV-{{ $rsv->id }} | {{ $rsv->nama_pemohon }} - Paket: {{ $rsv->paket }}
-                        </option>
-                    @endforeach
-                </select>
-                                
-                <!-- Teks Notifikasi Sisa Bayar -->
-                <p id="teks_sisa_bayar" class="text-xs font-bold text-orange-600 mt-2 hidden"></p>
-            </div>
 
-            <div class="mb-6">
-                <label class="block text-sm font-bold text-slate-700 mb-2">Keterangan</label>
-                <input type="text" name="keterangan" placeholder="Contoh: Kotak amal Jumat minggu ke-1" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-bold text-slate-700 mb-2">Nominal (Rp) <span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><span class="text-slate-500 font-bold font-mono">Rp</span></div>
-                    <input type="number" name="nominal" class="w-full bg-slate-50 border border-slate-300 pl-12 pr-4 py-3 rounded-xl font-bold text-lg outline-none focus:ring-2 focus:ring-green-500" placeholder="0" required />
+            {{-- ===================== SECTION PEMASUKAN ===================== --}}
+            <div id="section_pemasukan" class="hidden">
+
+                {{-- Hubungkan ke Reservasi (muncul jika kategori = pelunasan) --}}
+                <div class="mb-6 hidden transition-all duration-300" id="div_pilih_reservasi">
+                    <label class="block text-sm font-bold text-blue-600 mb-2">
+                        <i class="fa-solid fa-link mr-1"></i> Hubungkan ke Data Reservasi <span class="text-red-500">*</span>
+                    </label>
+                    <select name="reservasi_id" id="input_reservasi_id" class="w-full border border-slate-300 px-4 py-3 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="" disabled selected data-sisa="0">Pilih data reservasi...</option>
+                        @foreach($semuaReservasi as $rsv)
+                            @php
+                                $terbayar = $rsv->transaksis->where('jenis', 'pemasukan')->sum('nominal');
+                                $sisa = max(0, $rsv->grand_total - $terbayar);
+                            @endphp
+                            <option value="{{ $rsv->id }}" data-sisa="{{ $sisa }}">
+                                #RSV-{{ $rsv->id }} | {{ $rsv->nama_pemohon }} - Paket: {{ $rsv->paket }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p id="teks_sisa_bayar" class="text-xs font-bold text-orange-600 mt-2 hidden"></p>
                 </div>
-            </div>
-            
+
+                {{-- Nama Penyetor --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Nama Penyetor</label>
+                    <input type="text" name="nama_penyetor" placeholder="Contoh: Abdullah Ilham" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
+
+                {{-- Bentuk Transaksi (Pemasukan) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">Bentuk Transaksi <span class="text-red-500">*</span></label>
+                    <div class="flex gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="flex items-center gap-2 font-bold cursor-pointer text-slate-700 hover:text-green-600">
+                            <input type="radio" name="uang" value="Tunai" class="accent-green-600 w-5 h-5"> Uang Tunai
+                        </label>
+                        <label class="flex items-center gap-2 font-bold cursor-pointer text-slate-700 hover:text-red-600">
+                            <input type="radio" name="uang" value="Non Tunai" class="accent-red-600 w-5 h-5"> Non Tunai (Transfer, E-Wallet, dll)
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Keterangan (Pemasukan) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Keterangan</label>
+                    <input type="text" name="keterangan_pemasukan" placeholder="Contoh: Kotak amal Jumat minggu ke-1" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
+
+                {{-- Nominal (Pemasukan) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Nominal (Rp) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="text-slate-500 font-bold font-mono">Rp</span>
+                        </div>
+                        <input type="number" name="nominal" id="nominal_pemasukan" class="w-full bg-slate-50 border border-slate-300 pl-12 pr-4 py-3 rounded-xl font-bold text-lg outline-none focus:ring-2 focus:ring-green-500" placeholder="0" />
+                    </div>
+                </div>
+
+            </div>{{-- end section_pemasukan --}}
+
+            {{-- ===================== SECTION PENGELUARAN ===================== --}}
+            <div id="section_pengeluaran" class="hidden">
+
+                {{-- Pihak Penerima --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Pihak Penerima <span class="text-red-500">*</span></label>
+                    <input type="text" name="pihak_penerima" id="pihak_penerima" placeholder="Contoh: Toko Bangunan Maju, CV. Sejahtera, dll" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-400" />
+                </div>
+
+                {{-- Bentuk Transaksi (Pengeluaran) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">Bentuk Transaksi <span class="text-red-500">*</span></label>
+                    <div class="flex gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="flex items-center gap-2 font-bold cursor-pointer text-slate-700 hover:text-green-600">
+                            <input type="radio" name="bentuk_pengeluaran" id="bentuk_tunai" value="Tunai" class="accent-green-600 w-5 h-5"> Uang Tunai
+                        </label>
+                        <label class="flex items-center gap-2 font-bold cursor-pointer text-slate-700 hover:text-red-600">
+                            <input type="radio" name="bentuk_pengeluaran" id="bentuk_nontunai" value="Non Tunai" class="accent-red-600 w-5 h-5"> Non Tunai (Transfer, E-Wallet, dll)
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Keterangan (Pengeluaran) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Keterangan</label>
+                    <input type="text" name="keterangan_pengeluaran" id="keterangan_pengeluaran" placeholder="Contoh: Pembelian cat tembok untuk renovasi lantai 2" class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-400" />
+                </div>
+
+                {{-- Nominal (Pengeluaran) --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Nominal (Rp) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="text-slate-500 font-bold font-mono">Rp</span>
+                        </div>
+                        <input type="number" name="nominal" id="nominal_pengeluaran" class="w-full bg-slate-50 border border-slate-300 pl-12 pr-4 py-3 rounded-xl font-bold text-lg outline-none focus:ring-2 focus:ring-red-400" placeholder="0" />
+                    </div>
+                </div>
+
+                {{-- Bukti Transaksi --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Bukti Transaksi</label>
+                    <div class="relative">
+                        <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*,.pdf"
+                            class="w-full bg-slate-50 border border-slate-300 px-4 py-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-400 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-red-50 file:text-red-600 hover:file:bg-red-100 cursor-pointer" />
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Format: JPG, PNG, PDF. Maks. 2MB.</p>
+                </div>
+
+            </div>{{-- end section_pengeluaran --}}
+
+            {{-- Tombol Submit --}}
             <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-xl font-bold shadow-md shadow-green-200 transition">Simpan Transaksi Manual</button>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-xl font-bold shadow-md shadow-green-200 transition">
+                    Simpan Transaksi Manual
+                </button>
             </div>
         </form>
     </div>
@@ -73,47 +157,77 @@
 
 @push('scripts')
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const kategoriPemasukan = @json($kategoriPemasukan ?? []);
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const kategoriPemasukan   = @json($kategoriPemasukan ?? []);
         const kategoriPengeluaran = @json($kategoriPengeluaran ?? []);
 
-        const radioIn  = document.getElementById('radio_pemasukan');
-        const radioOut = document.getElementById('radio_pengeluaran');
+        const radioIn   = document.getElementById('radio_pemasukan');
+        const radioOut  = document.getElementById('radio_pengeluaran');
         const katSelect = document.getElementById('kategori_akun');
-        
-        const divPilihReservasi = document.getElementById('div_pilih_reservasi');
-        const inputReservasiId = document.getElementById('input_reservasi_id');
 
+        const sectionPemasukan   = document.getElementById('section_pemasukan');
+        const sectionPengeluaran = document.getElementById('section_pengeluaran');
+
+        const divPilihReservasi = document.getElementById('div_pilih_reservasi');
+        const inputReservasiId  = document.getElementById('input_reservasi_id');
+
+        // --- Helper: reset field reservasi ---
         function resetReservasiField() {
-            if(!divPilihReservasi) return;
+            if (!divPilihReservasi) return;
             divPilihReservasi.classList.add('hidden');
             inputReservasiId.removeAttribute('required');
             inputReservasiId.value = "";
         }
 
-        if(radioIn) {
+        // --- Helper: toggle section pemasukan / pengeluaran ---
+        function showSection(jenis) {
+            if (jenis === 'pemasukan') {
+                sectionPemasukan.classList.remove('hidden');
+                sectionPengeluaran.classList.add('hidden');
+
+                // Nominal: aktifkan field pemasukan, nonaktifkan pengeluaran
+                document.getElementById('nominal_pemasukan').setAttribute('required', 'required');
+                document.getElementById('nominal_pengeluaran').removeAttribute('required');
+
+            } else {
+                sectionPengeluaran.classList.remove('hidden');
+                sectionPemasukan.classList.add('hidden');
+
+                // Nominal: aktifkan field pengeluaran, nonaktifkan pemasukan
+                document.getElementById('nominal_pengeluaran').setAttribute('required', 'required');
+                document.getElementById('nominal_pemasukan').removeAttribute('required');
+
+                // Reset reservasi karena pengeluaran tidak butuh itu
+                resetReservasiField();
+            }
+        }
+
+        // --- Listener radio jenis ---
+        if (radioIn) {
             radioIn.addEventListener('change', () => {
                 katSelect.disabled = false;
-                katSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Pemasukan --</option>' + 
+                katSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Pemasukan --</option>' +
                     kategoriPemasukan.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
+                showSection('pemasukan');
                 resetReservasiField();
             });
         }
 
-        if(radioOut) {
+        if (radioOut) {
             radioOut.addEventListener('change', () => {
                 katSelect.disabled = false;
-                katSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Pengeluaran --</option>' + 
+                katSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Pengeluaran --</option>' +
                     kategoriPengeluaran.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
-                resetReservasiField();
+                showSection('pengeluaran');
             });
         }
 
-        if(katSelect) {
-            katSelect.addEventListener('change', function() {
-                let namaKategoriTerpilih = this.options[this.selectedIndex].text.toLowerCase();
-                
-                if (namaKategoriTerpilih.includes('pelunasan')) {
+        // --- Listener kategori → tampilkan reservasi jika "pelunasan" (khusus pemasukan) ---
+        if (katSelect) {
+            katSelect.addEventListener('change', function () {
+                let namaKategori = this.options[this.selectedIndex].text.toLowerCase();
+                if (radioIn.checked && namaKategori.includes('pelunasan')) {
                     divPilihReservasi.classList.remove('hidden');
                     inputReservasiId.setAttribute('required', 'required');
                 } else {
@@ -122,34 +236,65 @@
             });
         }
 
-        // LOGIKA AUTO-FILL NOMINAL SISA BAYAR
+        // --- Listener pilih reservasi → auto-isi nominal sisa ---
         const selectReservasi = document.getElementById('input_reservasi_id');
-        const inputNominal = document.querySelector('input[name="nominal"]');
-        const teksSisa = document.getElementById('teks_sisa_bayar');
+        const teksSisa        = document.getElementById('teks_sisa_bayar');
 
-        if(selectReservasi) {
-            selectReservasi.addEventListener('change', function() {
-                // Ambil data "sisa bayar" dari opsi yang dipilih admin
+        if (selectReservasi) {
+            selectReservasi.addEventListener('change', function () {
                 let selectedOption = this.options[this.selectedIndex];
                 let sisa = selectedOption.getAttribute('data-sisa');
-                
-                if(sisa && parseInt(sisa) > 0) {
-                    // Isi otomatis input nominal
-                    inputNominal.value = sisa; 
-                    // Tampilkan notifikasi
+                let nominalEl = document.getElementById('nominal_pemasukan');
+
+                if (sisa && parseInt(sisa) > 0) {
+                    nominalEl.value = sisa;
                     teksSisa.textContent = "Sisa tagihan: Rp " + parseInt(sisa).toLocaleString('id-ID');
-                    teksSisa.classList.remove('hidden');
+                    teksSisa.classList.remove('hidden', 'text-green-600');
+                    teksSisa.classList.add('text-orange-600');
                 } else if (sisa !== null && parseInt(sisa) === 0) {
-                    inputNominal.value = "";
-                    teksSisa.textContent = " sudah lunas.";
+                    nominalEl.value = "";
+                    teksSisa.textContent = "Reservasi ini sudah lunas.";
                     teksSisa.classList.remove('hidden', 'text-orange-600');
                     teksSisa.classList.add('text-green-600');
                 } else {
-                    inputNominal.value = "";
+                    nominalEl.value = "";
                     teksSisa.classList.add('hidden');
                 }
             });
         }
+
+        // --- Submit: gabungkan field ke keterangan_final ---
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (!form.action.includes('keuangan')) return; // pastikan form yang benar
+            const keteranganFinal = document.getElementById('keterangan_final');
+
+            if (radioIn && radioIn.checked) {
+                // PEMASUKAN: gabungkan nama_penyetor + bentuk + keterangan_pemasukan
+                const namaPenyetor    = document.querySelector('input[name="nama_penyetor"]')?.value.trim() ?? '';
+                const bentukTrx       = document.querySelector('input[name="uang"]:checked')?.value ?? '';
+                const keteranganInput = document.querySelector('input[name="keterangan_pemasukan"]')?.value.trim() ?? '';
+
+                let bagian = [];
+                if (namaPenyetor) bagian.push('Penyetor: ' + namaPenyetor);
+                if (bentukTrx)    bagian.push('Via: ' + bentukTrx);
+
+                keteranganFinal.value = (keteranganInput ? keteranganInput + (bagian.length ? ' | ' : '') : '') + bagian.join(' | ');
+
+            } else if (radioOut && radioOut.checked) {
+                // PENGELUARAN: gabungkan pihak_penerima + bentuk_pengeluaran + keterangan_pengeluaran
+                const pihakPenerima   = document.getElementById('pihak_penerima')?.value.trim() ?? '';
+                const bentukPengeluaran = document.querySelector('input[name="bentuk_pengeluaran"]:checked')?.value ?? '';
+                const keteranganPengeluaran = document.getElementById('keterangan_pengeluaran')?.value.trim() ?? '';
+
+                let bagian = [];
+                if (pihakPenerima)      bagian.push('Penerima: ' + pihakPenerima);
+                if (bentukPengeluaran)  bagian.push('Via: ' + bentukPengeluaran);
+
+                keteranganFinal.value = (keteranganPengeluaran ? keteranganPengeluaran + (bagian.length ? ' | ' : '') : '') + bagian.join(' | ');
+            }
+        });
+
     });
 </script>
 @endpush

@@ -129,6 +129,7 @@
             const form = document.getElementById('loginForm');
             form.classList.add('shake');
             form.addEventListener('animationend', () => form.classList.remove('shake'));
+            
         </script>
     @endif
 
