@@ -8,25 +8,67 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+    // === LOGIN & REGISTER LEWAT GOOGLE ===
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            if (!$user) {
+                session([
+                    'google_name'  => $googleUser->getName(),
+                    'google_email' => $googleUser->getEmail(),
+                    'google_id'    => $googleUser->getId(),
+                ]);
+
+                return redirect('/login')->with('show_register', true)
+                    ->withErrors(['USER_EMAIL' => 'Email Google Anda belum terdaftar. Silakan daftar terlebih dahulu.']);
+            }
+
+            $user->update([
+                'google_id'         => $googleUser->getId(),
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
+
+            Auth::login($user);
+
+            return redirect('/')->with('welcome', "Selamat datang, {$user->name}!");
+
+        } catch (\Exception $e) {
+            return redirect('/login')->withErrors([
+                'USER_EMAIL' => 'Login Google gagal, coba lagi.'
+            ]);
+        }
+    }
+
     // === FUNGSI DAFTAR (REGISTER) ===
     public function register(Request $request)
     {
         $request->validate([
-            'USER_NAME' => 'required|string|max:255',
-            'USER_EMAIL' => 'required|string|email|unique:users,email',
+            'USER_NAME'     => 'required|string|max:255',
+            'USER_EMAIL'    => 'required|string|email|unique:users,email',
             'USER_PASSWORD' => 'required|min:6',
-            'USER_GENDER' => 'required|in:L,P',
+            'USER_GENDER'   => 'required|in:L,P',
         ]);
 
         $user = User::create([
-            'name' => $request->USER_NAME,
-            'email' => $request->USER_EMAIL,
-            'password' => Hash::make($request->USER_PASSWORD), 
-            'gender' => $request->USER_GENDER,
-            'role' => 'jamaah', // Default 
+            'name'     => $request->USER_NAME,
+            'email'    => $request->USER_EMAIL,
+            'password' => Hash::make($request->USER_PASSWORD),
+            'gender'   => $request->USER_GENDER,
+            'role'     => 'jamaah',
         ]);
 
         event(new Registered($user));
@@ -34,30 +76,43 @@ class AuthController extends Controller
         return redirect()->route('login')->with('cek_email', 'Alhamdulillah, akun berhasil dibuat! Silakan cek kotak masuk Email Anda untuk mengaktifkan akun sebelum Masuk.');
     }
 
-    // === LOGIN (SUDAH DIPERBAIKI) ===
+    // === FUNGSI LOGIN ===
     public function login(Request $request)
     {
-        // 1. Cek cerdas: Apakah form mengirim ADMIN_EMAIL atau USER_EMAIL?
-        $emailName = $request->has('ADMIN_EMAIL') ? 'ADMIN_EMAIL' : 'USER_EMAIL';
+        // 1. Cek dari portal mana request ini dikirim
+        $emailName    = $request->has('ADMIN_EMAIL')    ? 'ADMIN_EMAIL'    : 'USER_EMAIL';
         $passwordName = $request->has('ADMIN_PASSWORD') ? 'ADMIN_PASSWORD' : 'USER_PASSWORD';
 
-        // 2. Validasi input yang masuk
+        // 2. Validasi input
         $request->validate([
-            $emailName => 'required|email',
+            $emailName    => 'required|email',
             $passwordName => 'required',
         ]);
 
+        // 3. Ambil data mentahnya
+        $email    = $request->$emailName;
+        $password = $request->$passwordName;
+
+        $user = User::where('email', $email)->first();
+
+        // 4. Cegah user Google login manual tanpa password
+        if ($user && (is_null($user->password) || $user->password === '')) {
+            return back()->withErrors([
+                $emailName => 'Akun ini terdaftar via Google. Silakan gunakan tombol "Login dengan Google", atau klik "Lupa password?" untuk membuat password baru.',
+            ])->onlyInput($emailName);
+        }
+
+        // 5. Setup kredensial
         $credentials = [
-            'email' => $request->$emailName,
-            'password' => $request->$passwordName
+            'email'    => $email,
+            'password' => $password,
         ];
 
-        // 3. Cek database: Apakah email & password benar?
+        // 6. Eksekusi Login & Pengecekan Kamar Portal
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $loginLewatAdmin = $request->is('admin*'); // Ngecek URL apakah ada kata 'admin'
+            $user            = Auth::user();
+            $loginLewatAdmin = $request->is('admin*');
 
-            // Pengecekan Murni Berdasarkan Kolom 'role' di Database
             if ($user->role === 'admin' && !$loginLewatAdmin) {
                 Auth::logout();
                 return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
@@ -68,17 +123,28 @@ class AuthController extends Controller
                 return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
             }
 
-            // Jika lolos semua, arahkan ke kamarnya masing-masing
             $request->session()->regenerate();
 
             if ($user->role === 'admin') {
                 return redirect('/admin/dashboard');
             }
 
-            return redirect()->intended('/')->with('welcome', "Selamat datang, {$user->name}!");
+            $redirectTo = $request->input('redirect', '/');
+
+            // Ambil hanya path-nya jika berupa URL penuh
+            if (filter_var($redirectTo, FILTER_VALIDATE_URL)) {
+                $redirectTo = parse_url($redirectTo, PHP_URL_PATH);
+                $query = parse_url($request->input('redirect'), PHP_URL_QUERY);
+                if ($query) $redirectTo .= '?' . $query;
+            }
+
+            // Fallback jika kosong
+            if (!$redirectTo) $redirectTo = '/';
+
+            return redirect($redirectTo)->with('welcome', "Selamat datang, {$user->name}!");
         }
 
-        // Jika email/password memang salah
+        // 7. Jika email/password salah
         return back()->withErrors([
             $emailName => 'Email atau password yang Anda masukkan tidak sesuai.',
         ])->onlyInput($emailName);

@@ -37,6 +37,7 @@
             <form action="{{ route('login') }}" method="POST" id="signInForm"
                   class="w-full flex flex-col items-center text-center transition-all duration-300 {{ $errors->hasAny(['USER_EMAIL','USER_PASSWORD']) ? '' : '' }}">
                 @csrf
+                <input type="hidden" name="redirect" value="{{ request('redirect') }}"> {{-- ← tambahkan ini --}}
                 <h1 class="text-3xl font-bold mb-6 text-green-700">Masuk</h1>
 
                 <div class="flex gap-3 mb-5 w-full">
@@ -56,6 +57,7 @@
                     <hr class="flex-grow border-gray-200">
                 </div>
 
+                {{-- ✅ Field Email Login --}}
                 <input type="email" name="USER_EMAIL" id="loginEmail"
                        value="{{ old('USER_EMAIL') }}"
                        placeholder="Email"
@@ -68,6 +70,7 @@
                     </p>
                 @enderror
 
+                {{-- ✅ Field Password Login --}}
                 <input type="password" name="USER_PASSWORD" id="loginPassword"
                        placeholder="Password"
                        class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
@@ -80,7 +83,7 @@
                 @enderror
 
                 <div class="w-full flex justify-end mb-6">
-                    <a id="forgotPassBtn" class="text-xs text-gray-500 hover:text-green-700 hover:underline cursor-pointer">
+                    <a href="{{ route('password.request') }}" class="text-xs text-gray-500 hover:text-green-700 hover:underline">
                         Lupa password?
                     </a>
                 </div>
@@ -102,7 +105,14 @@
                   class="w-full flex flex-col items-center text-center hidden-form transition-all duration-300">
                 @csrf
                 <h1 class="text-3xl font-bold mb-2 text-green-700">Buat Akun</h1>
-
+                
+                {{-- Notif dari Google --}}
+                @if(session('show_register'))
+                <div class="w-full bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl text-xs font-semibold mb-4 flex items-center gap-2 slide-down">
+                    <i class="fa-brands fa-google text-red-400"></i>
+                    Akun Google Anda belum terdaftar. Silakan lengkapi data di bawah untuk mendaftar.
+                </div>
+                @endif
                 <div class="flex gap-3 mb-5 w-full">
                     <a href="{{ url('auth/google') }}" class="flex-1 border border-gray-300 rounded-lg py-2.5 flex items-center justify-center gap-2 hover:bg-gray-50 transition">
                         <i class="fa-brands fa-google text-red-500 text-lg"></i>
@@ -120,8 +130,9 @@
                     <hr class="flex-grow border-gray-200">
                 </div>
 
+                {{-- ✅ Field Nama --}}
                 <input type="text" name="USER_NAME"
-                       value="{{ old('USER_NAME') }}"
+                       value="{{ old('USER_NAME', session('google_name')) }}"
                        placeholder="Username"
                        class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
                               {{ $errors->has('USER_NAME') ? 'border-red-400 bg-red-50 mb-1' : 'border-gray-300 mb-4' }}"
@@ -132,12 +143,13 @@
                     </p>
                 @enderror
 
+                {{-- ✅ Field Email Register --}}
                 <input type="email" name="USER_EMAIL"
-                       value="{{ old('USER_EMAIL') }}"
-                       placeholder="Email"
-                       class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
-                              {{ $errors->has('USER_EMAIL') && session('_old_input.USER_NAME') !== null ? 'border-red-400 bg-red-50 mb-1' : 'border-gray-300 mb-4' }}"
-                       required />
+                    value="{{ old('USER_EMAIL', session('google_email')) }}"
+                    placeholder="Email"
+                    class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
+                            {{ $errors->has('USER_EMAIL') && session('_old_input.USER_NAME') !== null ? 'border-red-400 bg-red-50 mb-1' : 'border-gray-300 mb-4' }}"
+                    required />
                 @error('USER_EMAIL')
                     @if(old('USER_NAME') !== null)
                         <p class="w-full text-xs text-red-500 mb-3 pl-1 text-left flex items-center gap-1 slide-down">
@@ -146,6 +158,7 @@
                     @endif
                 @enderror
 
+                {{-- ✅ Field Password Register --}}
                 <input type="password" name="USER_PASSWORD"
                        placeholder="Password"
                        class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
@@ -157,6 +170,7 @@
                     </p>
                 @enderror
 
+                {{-- ✅ Field Gender --}}
                 <div class="flex justify-center gap-6 w-full mb-5 px-2 py-3 rounded-lg
                             {{ $errors->has('USER_GENDER') ? 'bg-red-50 border border-red-300' : 'bg-gray-50 border border-gray-200' }}">
                     <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-green-700 transition font-medium">
@@ -228,14 +242,17 @@
         const showSignUpBtn = document.getElementById('showSignUpBtn');
         const showSignInBtn = document.getElementById('showSignInBtn');
 
+        // ✅ Deteksi error: tampilkan form yang sesuai secara otomatis
         const hasLoginError   = {{ $errors->hasAny(['USER_EMAIL', 'USER_PASSWORD']) && old('USER_NAME') === null ? 'true' : 'false' }};
         const hasRegisterError = {{ old('USER_NAME') !== null ? 'true' : 'false' }};
 
-        if (hasRegisterError) {
+        const showRegisterFromGoogle = {{ session('show_register') ? 'true' : 'false' }};
+
+        if (hasRegisterError || showRegisterFromGoogle) {
             signInForm.classList.add('hidden-form');
             signUpForm.classList.remove('hidden-form');
         }
-
+        // ✅ Shake form jika ada error
         @if($errors->any())
             const activeForm = hasRegisterError ? signUpForm : signInForm;
             activeForm.classList.add('shake');

@@ -11,7 +11,6 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-arabic { font-family: 'Amiri', serif; }
-
         .mask-to-left {
             mask-image: linear-gradient(to left, black 70%, transparent 100%);
             -webkit-mask-image: linear-gradient(to left, black 70%, transparent 100%);
@@ -20,7 +19,6 @@
             mask-image: linear-gradient(to right, black 70%, transparent 100%);
             -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
         }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -37,6 +35,7 @@
 
     <div class="w-full flex flex-col">
 
+        {{-- PAKET WORKSHOP --}}
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/work.jpg') }}', '{{ asset('images/reservasi/work2.jpg') }}', '{{ asset('images/reservasi/work3.jpg') }}'],
@@ -58,7 +57,7 @@
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Wifi</li>
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 2 LCD Proyektor</li>
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Podium</li>
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Ruanga ber AC</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Ruangan ber AC</li>
                     </ul>
                 </div>
 
@@ -67,9 +66,17 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Harga Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
                     </div>
-                    <a href="{{ route('reservasi.tgl', ['paket' => 'Workshop']) }}" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                        Pilih Paket
-                    </a>
+                    @auth
+                        <a href="{{ route('reservasi.tgl', ['paket' => 'Workshop']) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Workshop'])) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @endauth
                 </div>
             </div>
 
@@ -84,6 +91,7 @@
             </div>
         </section>
 
+        {{-- PAKET WISUDA --}}
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/wisuda.jpg') }}', '{{ asset('images/reservasi/wisuda2.jpg') }}', '{{ asset('images/reservasi/wisuda3.jpg') }}'],
@@ -119,9 +127,17 @@
                 </div>
 
                 <div class="flex flex-row-reverse items-center gap-6 justify-end">
-                    <a href="{{ route('reservasi.tgl', ['paket' => 'Wisuda']) }}" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                        Pilih Paket
-                    </a>
+                    @auth
+                        <a href="{{ route('reservasi.tgl', ['paket' => 'Wisuda']) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Wisuda'])) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @endauth
                     <div class="text-left md:text-right">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Biaya Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
@@ -130,6 +146,7 @@
             </div>
         </section>
 
+        {{-- PAKET MAJELIS TAKLIM --}}
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/majlis.jpg') }}', '{{ asset('images/reservasi/majlis1.png') }}', '{{ asset('images/reservasi/majlis2.jpg') }}'],
@@ -144,14 +161,13 @@
                     <ul class="space-y-2 text-sm font-semibold">
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 100 Kursi</li>
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 2 Meja Terima Tamu</li>
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Podium & Ruang VIP
-                    </li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Podium & Ruang VIP</li>
                     </ul>
                     <ul class="space-y-2 text-sm font-semibold">
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 2 Sound System</li>
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 1 Sound Man</li>
                         <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 2 LCD Proyektor</li>
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> AC & Wifi </li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> AC & Wifi</li>
                     </ul>
                 </div>
 
@@ -160,9 +176,17 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Biaya Sewa</p>
                         <p class="text-3xl font-extrabold text-slate-900">Rp 7.500.000</p>
                     </div>
-                    <a href="{{ route('reservasi.tgl', ['paket' => 'Majelis']) }}" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
-                        Pilih Paket
-                    </a>
+                    @auth
+                        <a href="{{ route('reservasi.tgl', ['paket' => 'Majelis']) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}?redirect={{ urlencode(route('reservasi.tgl', ['paket' => 'Majelis'])) }}"
+                           class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md active:scale-95">
+                            Pilih Paket
+                        </a>
+                    @endauth
                 </div>
             </div>
 
@@ -176,6 +200,7 @@
                 </div>
             </div>
         </section>
+
     </div>
 
 </body>
