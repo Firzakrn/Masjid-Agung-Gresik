@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -65,9 +66,9 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => $request->USER_NAME,
             'email'    => $request->USER_EMAIL,
-            'password' => Hash::make($request->USER_PASSWORD), 
+            'password' => Hash::make($request->USER_PASSWORD),
             'gender'   => $request->USER_GENDER,
-            'role'     => 'jamaah', // Default jamaah
+            'role'     => 'jamaah',
         ]);
 
         event(new Registered($user));
@@ -75,11 +76,11 @@ class AuthController extends Controller
         return redirect()->route('login')->with('cek_email', 'Alhamdulillah, akun berhasil dibuat! Silakan cek kotak masuk Email Anda untuk mengaktifkan akun sebelum Masuk.');
     }
 
-    // === LOGIN (PERBAIKAN KAMAR PORTAL) ===
+    // === FUNGSI LOGIN ===
     public function login(Request $request)
     {
-        // 1. Cek dari portal mana request ini dikirim?
-        $emailName    = $request->has('ADMIN_EMAIL') ? 'ADMIN_EMAIL' : 'USER_EMAIL';
+        // 1. Cek dari portal mana request ini dikirim
+        $emailName    = $request->has('ADMIN_EMAIL')    ? 'ADMIN_EMAIL'    : 'USER_EMAIL';
         $passwordName = $request->has('ADMIN_PASSWORD') ? 'ADMIN_PASSWORD' : 'USER_PASSWORD';
 
         // 2. Validasi input
@@ -88,7 +89,7 @@ class AuthController extends Controller
             $passwordName => 'required',
         ]);
 
-        // 3. Ambil data mentahnya (TANPA $request-> di array kredensial)
+        // 3. Ambil data mentahnya
         $email    = $request->$emailName;
         $password = $request->$passwordName;
 
@@ -101,39 +102,49 @@ class AuthController extends Controller
             ])->onlyInput($emailName);
         }
 
-        // 5. Setup kredensial yang BENAR
+        // 5. Setup kredensial
         $credentials = [
             'email'    => $email,
             'password' => $password,
         ];
 
-        // 6. Eksekusi Login & Pengecekan Kamar
-        // ... di dalam fungsi login() ...
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
-        $loginLewatAdmin = $request->is('admin*');
+        // 6. Eksekusi Login & Pengecekan Kamar Portal
+        if (Auth::attempt($credentials)) {
+            $user            = Auth::user();
+            $loginLewatAdmin = $request->is('admin*');
 
-        // Cek Kamar
-        if ($user->role === 'admin' && !$loginLewatAdmin) {
-            Auth::logout();
-            return redirect('/login')->withErrors(['USER_EMAIL' => 'Admin harus login lewat Portal Admin.']);
+            if ($user->role === 'admin' && !$loginLewatAdmin) {
+                Auth::logout();
+                return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
+            }
+
+            if ($user->role === 'jamaah' && $loginLewatAdmin) {
+                Auth::logout();
+                return back()->withErrors([$emailName => 'Email atau password yang Anda masukkan tidak sesuai.'])->onlyInput($emailName);
+            }
+
+            $request->session()->regenerate();
+
+            if ($user->role === 'admin') {
+                return redirect('/admin/dashboard');
+            }
+
+            $redirectTo = $request->input('redirect', '/');
+
+            // Ambil hanya path-nya jika berupa URL penuh
+            if (filter_var($redirectTo, FILTER_VALIDATE_URL)) {
+                $redirectTo = parse_url($redirectTo, PHP_URL_PATH);
+                $query = parse_url($request->input('redirect'), PHP_URL_QUERY);
+                if ($query) $redirectTo .= '?' . $query;
+            }
+
+            // Fallback jika kosong
+            if (!$redirectTo) $redirectTo = '/';
+
+            return redirect($redirectTo)->with('welcome', "Selamat datang, {$user->name}!");
         }
-        
-        if ($user->role === 'jamaah' && $loginLewatAdmin) {
-            Auth::logout();
-            return redirect('/admin/login')->withErrors(['ADMIN_EMAIL' => 'Jamaah dilarang masuk sini.']);
-        }
 
-        $request->session()->regenerate();
-
-        // TEMBAK LANGSUNG KE URL, JANGAN PAKAI INTENDED
-        if ($user->role === 'admin') {
-            return redirect('/admin/dashboard');
-        }
-        return redirect('/');
-    }
-
-        // Jika email/password memang salah dari awal
+        // 7. Jika email/password salah
         return back()->withErrors([
             $emailName => 'Email atau password yang Anda masukkan tidak sesuai.',
         ])->onlyInput($emailName);

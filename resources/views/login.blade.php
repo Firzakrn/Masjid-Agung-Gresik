@@ -37,6 +37,7 @@
             <form action="{{ route('login') }}" method="POST" id="signInForm"
                   class="w-full flex flex-col items-center text-center transition-all duration-300 {{ $errors->hasAny(['USER_EMAIL','USER_PASSWORD']) ? '' : '' }}">
                 @csrf
+                <input type="hidden" name="redirect" value="{{ request('redirect') }}"> {{-- ← tambahkan ini --}}
                 <h1 class="text-3xl font-bold mb-6 text-green-700">Masuk</h1>
 
                 <div class="flex gap-3 mb-5 w-full">

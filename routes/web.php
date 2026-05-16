@@ -9,27 +9,8 @@ use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
 
-// Halaman "silakan verifikasi email kamu"
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-// Link verifikasi yang dikirim ke email
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/home'); // ganti sesuai route tujuan setelah verified
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-// Kirim ulang email verifikasi
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Link verifikasi telah dikirim!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-// Route admin ZIS tetap di luar auth jamaah (sudah diproteksi is_admin di bawah)
+// ✅ Route admin ZIS tetap di luar auth jamaah (sudah diproteksi is_admin di bawah)
 Route::post('/admin/zis/{id}/acc', [KeuanganController::class, 'accZis'])->name('zis.acc');
 Route::post('/admin/zis/{id}/tolak', [KeuanganController::class, 'tolakZis'])->name('zis.tolak');
 
