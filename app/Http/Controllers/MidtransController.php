@@ -15,49 +15,64 @@ class MidtransController extends Controller
     // Webhook dari Midtrans — dipanggil otomatis saat bayar
     // POST /midtrans/notification
     // --------------------------------------------------------
-    public function handleNotification(Request $request)
-    {
-        $this->configureMidtrans();
+   public function handleNotification(Request $request)
+{
+    $this->configureMidtrans();
 
-        try {
-            $payload = $request->all();
+    try {
+        $payload = $request->all();
 
-            $orderId           = $payload['order_id'];
-            $transactionStatus = $payload['transaction_status'];
-            $paymentType       = $payload['payment_type'];
-            $fraudStatus       = $payload['fraud_status'] ?? 'accept';
-            $grossAmount       = (int) $payload['gross_amount'];
+        $orderId           = $payload['order_id'];
+        $transactionStatus = $payload['transaction_status'];
+        $paymentType       = $payload['payment_type'];
+        $fraudStatus       = $payload['fraud_status'] ?? 'accept';
+        $grossAmount       = (int) $payload['gross_amount'];
 
-            // Ambil ID reservasi dari order_id (format: RSV-{id}-{timestamp})
-            $parts       = explode('-', $orderId);
-            $reservasiId = $parts[1] ?? null;
-            $reservasi   = Reservasi::find($reservasiId);
+        $parts       = explode('-', $orderId);
+        $reservasiId = $parts[1] ?? null;
+        $isLunas     = str_starts_with($orderId, 'LUNAS-'); // <-- tambah ini
 
-            if (!$reservasi) {
-                return response()->json(['message' => 'Reservasi tidak ditemukan'], 404);
-            }
-
-            if ($transactionStatus === 'capture') {
-                if ($fraudStatus === 'challenge') {
-                    $this->setStatusMenunggu($reservasi);
-                } elseif ($fraudStatus === 'accept') {
-                    $this->setStatusLunas($reservasi, $paymentType, $grossAmount);
-                }
-            } elseif ($transactionStatus === 'settlement') {
-                $this->setStatusLunas($reservasi, $paymentType, $grossAmount);
-            } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
-                $this->setStatusGagal($reservasi);
-            } elseif ($transactionStatus === 'pending') {
-                $this->setStatusMenunggu($reservasi);
-            }
-
-            return response()->json(['message' => 'Notifikasi berhasil diproses']);
-
-        } catch (\Exception $e) {
-            \Log::error('Midtrans Webhook Error: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage()], 500);
+        $reservasi = Reservasi::find($reservasiId);
+        if (!$reservasi) {
+            return response()->json(['message' => 'Reservasi tidak ditemukan'], 404);
         }
+
+        if ($transactionStatus === 'capture') {
+            if ($fraudStatus === 'challenge') {
+                $this->setStatusMenunggu($reservasi);
+            } elseif ($fraudStatus === 'accept') {
+                $isLunas
+                    ? $this->setStatusLunasPending($reservasi)
+                    : $this->setStatusLunas($reservasi, $paymentType, $grossAmount);
+            }
+        } elseif ($transactionStatus === 'settlement') {
+            $isLunas
+                ? $this->setStatusLunasPending($reservasi)
+                : $this->setStatusLunas($reservasi, $paymentType, $grossAmount);
+        } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
+            $this->setStatusGagal($reservasi);
+        } elseif ($transactionStatus === 'pending') {
+            $this->setStatusMenunggu($reservasi);
+        }
+
+        return response()->json(['message' => 'Notifikasi berhasil diproses']);
+
+    } catch (\Exception $e) {
+        \Log::error('Midtrans Webhook Error: ' . $e->getMessage());
+        return response()->json(['message' => $e->getMessage()], 500);
     }
+}
+
+// Tambah method baru ini
+private function setStatusLunasPending(Reservasi $reservasi): void
+{
+    if ($reservasi->status_dp === 'lunas') return;
+
+    $reservasi->update([
+        'status_dp' => 'dp_lunas_pending',
+        'status'    => 'DP Lunas – Menunggu Konfirmasi Admin',
+    ]);
+}
 
     // --------------------------------------------------------
     // Status: DP Lunas → catat ke kas otomatis
@@ -96,4 +111,5 @@ class MidtransController extends Controller
         Config::$isSanitized  = true;
         Config::$is3ds        = true;
     }
+    
 }

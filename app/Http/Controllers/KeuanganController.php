@@ -12,71 +12,82 @@ use Carbon\Carbon;
 class KeuanganController extends Controller
 {
     public function index()
-    {
-        $antreanDp = Reservasi::whereNotIn('status_dp', ['disetujui', 'ditolak'])
-            ->with('user')
-            ->latest()
-            ->get();
+{
+    $antreanDp = Reservasi::whereNotIn('status_dp', ['disetujui', 'ditolak', 'lunas'])
+        ->with('user')
+        ->latest()
+        ->get();
 
-        $riwayat = Transaksi::with(['kategori', 'reservasi'])
-            ->orderBy('tanggal', 'desc')
-            ->orderBy('id', 'desc')
-            ->get();
+    $riwayat = Transaksi::with(['kategori', 'reservasi'])
+        ->orderBy('tanggal', 'desc')
+        ->orderBy('id', 'desc')
+        ->get();
 
-        $kategoriPemasukan   = KategoriKeuangan::where('jenis', 'pemasukan')->get();
-        $kategoriPengeluaran = KategoriKeuangan::where('jenis', 'pengeluaran')->get();
-        $jumlahPendingDp     = $antreanDp->count();
+    $kategoriPemasukan   = KategoriKeuangan::where('jenis', 'pemasukan')->get();
+    $kategoriPengeluaran = KategoriKeuangan::where('jenis', 'pengeluaran')->get();
+    $jumlahPendingDp     = $antreanDp->count();
 
-        $semuaReservasi = Reservasi::with(['user', 'transaksis'])->latest()->get();
+    $semuaReservasi = Reservasi::with(['user', 'transaksis'])->latest()->get();
+    $antreanZis = Zis::where('status', 'pending')->latest()->get();
 
-        $antreanZis = Zis::where('status', 'pending')->latest()->get();
-
-        return view('admin.pencatatan.index', compact(
-            'antreanDp', 'antreanZis', 'riwayat', 'kategoriPemasukan',
-            'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'
-        ));
-    }
+    return view('admin.pencatatan.index', compact(
+        'antreanDp', 'antreanZis', 'riwayat', 'kategoriPemasukan',
+        'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'
+    ));
+}
 
     public function accDp($id)
     {
         $rsv = Reservasi::findOrFail($id);
+        $paketLokal = strtolower($rsv->paket);
 
-        // Deteksi nama kategori otomatis berdasarkan jenis paket
-        $paketLokal   = strtolower($rsv->paket);
-        $namaKategori = 'DP Social Event'; // Default
+        // Bedakan jenis transaksi
+        $isLunas = $rsv->status_dp === 'dp_lunas_pending';
 
-        if (str_contains($paketLokal, 'wedding')) {
-            $namaKategori = 'DP Wedding';
-        } elseif (str_contains($paketLokal, 'akad')) {
-            $namaKategori = 'DP Akad';
+        if ($isLunas) {
+        $namaKategori = 'Pelunasan Reservasi';
+        
+        // Fallback grand_total jika 0
+        $grandTotal = $rsv->grand_total;
+        if (!$grandTotal || $grandTotal == 0) {
+            $pkt = strtolower($rsv->paket);
+            if (str_contains($pkt, 'intimate wedding')) $grandTotal = 2500000;
+            elseif (str_contains($pkt, 'wedding')) $grandTotal = 12500000;
+            elseif (str_contains($pkt, 'akad')) $grandTotal = 3000000;
+            else $grandTotal = 7500000;
+        }
+        
+        $nominal = $grandTotal - $rsv->nominal_dp;
+        // ...
+        } else {
+            $namaKategori = 'DP Social Event'; // default
+            if (str_contains($paketLokal, 'wedding')) $namaKategori = 'DP Wedding';
+            elseif (str_contains($paketLokal, 'akad')) $namaKategori = 'DP Akad';
+            $nominal = $rsv->nominal_dp;
+            $rsv->update([
+                'status_dp' => 'disetujui',
+                'status'    => 'Sudah DP',
+            ]);
         }
 
-        // Cari atau buat kategori secara otomatis
         $kategori = KategoriKeuangan::firstOrCreate(
             ['nama' => $namaKategori],
             ['jenis' => 'pemasukan']
         );
 
-        // Update status reservasi
-        $rsv->update([
-            'status_dp' => 'disetujui',
-            'status'    => 'Sudah DP',
-        ]);
-
-        // Catat transaksi otomatis ke buku kas
         Transaksi::create([
             'reservasi_id' => $rsv->id,
             'kategori_id'  => $kategori->id,
             'sumber'       => 'sistem',
             'jenis'        => 'pemasukan',
-            'nominal'      => $rsv->nominal_dp,
+            'nominal'      => $nominal,
             'keterangan'   => $namaKategori . ': ' . $rsv->nama_pemohon . ' (#' . $rsv->id . ')',
             'tanggal'      => now(),
         ]);
 
-        return back()->with('success', 'Berhasil ACC! Data otomatis masuk ke kategori: ' . $namaKategori);
+        $pesan = $isLunas ? 'Pelunasan berhasil di-ACC! Reservasi statusnya LUNAS.' : 'Berhasil ACC DP! Data masuk ke kas kategori: ' . $namaKategori;
+        return back()->with('success', $pesan);
     }
-
     public function tolakDp($id)
     {
         $rsv = Reservasi::findOrFail($id);
@@ -257,6 +268,7 @@ class KeuanganController extends Controller
             $bukti = $request->file('bukti_transfer')->store('bukti_zis', 'public');
 
             Zis::create([
+                'user_id'        => auth()->id(),
                 'nama_pemberi'   => $request->nama_pemberi,
                 'jenis_dana'     => $request->jenis_dana,
                 'jumlah_orang'   => $request->jumlah_orang ?? 1,

@@ -12,6 +12,9 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
+Route::get('/reservasi/pelunasan/{id}', [ReservasiController::class, 'pelunasan'])->name('reservasi.pelunasan');
+Route::post('/reservasi/snap-token-lunas/{id}', [ReservasiController::class, 'snapTokenLunas'])->name('reservasi.snap-token-lunas');
+
 // Halaman "silakan verifikasi email kamu"
 Route::get('/email/verify', function () {
     return view('auth.verify-email');

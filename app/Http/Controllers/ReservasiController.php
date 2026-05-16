@@ -248,14 +248,6 @@ class ReservasiController extends Controller
     }
 
     // --------------------------------------------------------
-    // Halaman selesai (setelah Midtrans redirect finish_url)
-    // --------------------------------------------------------
-    public function selesai(Request $request, $id)
-    {
-        return redirect('/')->with('welcome', 'Alhamdulillah, Reservasi berhasil! Silakan tunggu konfirmasi Admin.');
-    }
-
-    // --------------------------------------------------------
     // Helper: Setup konfigurasi Midtrans
     // --------------------------------------------------------
     private function configureMidtrans(): void
@@ -275,5 +267,81 @@ class ReservasiController extends Controller
         if (stripos($paket, 'Wedding') !== false)         return [12500000, 3000000];
         if (stripos($paket, 'Akad') !== false)            return [3000000, 1000000];
         return [7500000, 2000000];
+    }
+    public function pelunasan($id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+
+        // Fallback: jika grand_total belum tersimpan, hitung dari paket
+        if (!$reservasi->grand_total || $reservasi->grand_total == 0) {
+            [$harga, $dp] = $this->hitungHargaDp($reservasi->paket);
+            $reservasi->grand_total = $harga;
+            $reservasi->nominal_dp  = $reservasi->nominal_dp ?: $dp;
+            $reservasi->save();
+        }
+
+        $sisaBayar = $reservasi->grand_total - $reservasi->nominal_dp;
+
+        return view('reservasi.konfirmasi.pelunasan', compact('reservasi', 'sisaBayar'));
+    }
+
+    public function snapTokenLunas($id)
+    {
+        try {
+            $reservasi = Reservasi::findOrFail($id);
+
+            if ($reservasi->user_id !== Auth::id()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            $sisaBayar = $reservasi->grand_total - $reservasi->nominal_dp;
+
+            $this->configureMidtrans();
+
+            $params = [
+                'enabled_payments' => ['qris', 'gopay', 'shopeepay', 'bca_va', 'bni_va', 'bri_va', 'mandiri_va'],
+                'transaction_details' => [
+                    'order_id'     => 'LUNAS-' . $reservasi->id . '-' . time(),
+                    'gross_amount' => $sisaBayar,
+                ],
+                'customer_details' => [
+                    'first_name' => $reservasi->nama_pemohon,
+                    'phone'      => $reservasi->telp_pemohon,
+                ],
+                'item_details' => [
+                    [
+                        'id'       => 'LUNAS-' . $reservasi->id,
+                        'price'    => $sisaBayar,
+                        'quantity' => 1,
+                        'name'     => 'Pelunasan: ' . $reservasi->paket,
+                    ]
+                ],
+                    'callbacks' => [
+                    'finish' => route('reservasi.selesai', $reservasi->id) . '?order_id=LUNAS-' . $reservasi->id,
+                    'notification' => env('NGROK_URL') . '/midtrans/notification',
+                ],
+            ];
+
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            return response()->json(['snap_token' => $snapToken]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function selesai(Request $request, $id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+        $orderId = $request->query('order_id', '');
+
+        if (str_starts_with($orderId, 'LUNAS-')) {
+            $reservasi->update([
+                'status_dp' => 'dp_lunas_pending',
+                'status'    => 'DP Lunas – Menunggu Konfirmasi Admin',
+            ]);
+        }
+
+        return redirect('/')->with('welcome', 'Alhamdulillah! Pembayaran lunas berhasil. Menunggu konfirmasi Admin.');
     }
 }

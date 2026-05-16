@@ -118,10 +118,34 @@
                                     <td class="px-6 py-4">
                                         <p class="font-bold text-slate-800">{{ $rsv->paket }}</p>
                                         <p class="text-xs text-slate-500">{{ $rsv->tanggal }}</p>
+                                        @if($rsv->status_dp === 'dp_lunas_pending')
+                                            <span class="inline-block mt-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                PELUNASAN
+                                            </span>
+                                        @else
+                                            <span class="inline-block mt-1 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                DP AWAL
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 font-bold text-green-600 text-base">
-                                        Rp {{ number_format($rsv->nominal_dp ?? 0, 0, ',', '.') }}
-                                    </td>
+                                        @if($rsv->status_dp === 'dp_lunas_pending')
+                                                @php
+                                                    $gt = $rsv->grand_total ?? 0;
+                                                    if ($gt == 0) {
+                                                        $pkt = strtolower($rsv->paket);
+                                                        if (str_contains($pkt, 'intimate wedding')) $gt = 2500000;
+                                                        elseif (str_contains($pkt, 'wedding')) $gt = 12500000;
+                                                        elseif (str_contains($pkt, 'akad')) $gt = 3000000;
+                                                        else $gt = 7500000;
+                                                    }
+                                                    $sisaLunas = $gt - ($rsv->nominal_dp ?? 0);
+                                                @endphp
+                                                Rp {{ number_format($sisaLunas, 0, ',', '.') }}
+                                            @else
+                                                Rp {{ number_format($rsv->nominal_dp ?? 0, 0, ',', '.') }}
+                                            @endif
+                                    </cl>
                                     <td class="px-6 py-4 text-center">
                                         @if($rsv->bukti_dp)
                                             <button 
