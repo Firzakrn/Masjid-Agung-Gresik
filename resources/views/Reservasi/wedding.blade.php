@@ -105,7 +105,7 @@
             </div>
 
             <div class="flex flex-col justify-center items-start md:items-end text-left md:text-right px-8 md:pr-12 lg:pr-24 xl:pr-40 py-16 order-1 md:order-2">
-                <span class="text-green-600 font-bold text-sm tracking-[0.2em] uppercase mb-4 block">Cozy & Sacred</span>
+                <span class="text-green-600 font-bold text-sm tracking-[0.2em] uppercase mb-4 block">MASJID LT 2</span>
                 <h2 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-8 leading-tight">Intimate <br>Wedding</h2>
                 
                 <div class="flex gap-10 mb-10 text-slate-600 justify-end w-full">

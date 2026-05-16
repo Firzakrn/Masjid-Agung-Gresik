@@ -29,7 +29,7 @@
         
         <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16 md:mt-0 items-center">
             <span class="inline-block py-1 px-3 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-100 font-bold text-sm tracking-widest uppercase mb-4 backdrop-blur-sm">
-                Fiqih & Edukasi Umat
+                Fiqih & Edukasi
             </span>
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-lg leading-tight">Panduan Lengkap <br><span class="text-emerald-400">Memahami Zakat</span></h1>
             <p class="text-lg md:text-xl text-emerald-50 max-w-2xl mx-auto leading-relaxed drop-shadow mb-10">
@@ -89,7 +89,7 @@
             <!-- FOTO 2: Al-Quran/Orang Berdoa -->
             <div class="md:col-span-5 flex flex-col gap-8">
                 <div class="rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 h-64 md:h-full relative group">
-                    <img src="https://images.unsplash.com/photo-1609599006353-e629aaab31ce?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="Al-Quran">
+                    <img src="https://images.unsplash.com/photo-1771493003867-1aa55f96df5d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="Al-Quran">
                     <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent"></div>
                 </div>
                 

@@ -29,8 +29,11 @@ class KeuanganController extends Controller
         ->where('status_dp', '!=', 'ditolak')
         ->latest()
         ->get();
-        
-        return view('admin.pencatatan.index', compact('antreanDp', 'riwayat', 'kategoriPemasukan', 'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'));
+
+        return view('admin.pencatatan.index', compact(
+            'antreanDp', 'riwayat', 'kategoriPemasukan',
+            'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'
+        ));
     }
 
     public function accDp($id)
@@ -47,7 +50,7 @@ class KeuanganController extends Controller
             $namaKategori = 'DP Akad';
         }
 
-        // 2. Cari kategori di database, kalau belum ada otomatis dibuatkan!
+        // 2. Cari kategori di database, kalau belum ada otomatis dibuatkan
         $kategori = KategoriKeuangan::firstOrCreate(
             ['nama' => $namaKategori],  
             ['jenis' => 'pemasukan']
@@ -55,7 +58,7 @@ class KeuanganController extends Controller
 
         // 3. Ubah status DP dan status utama menjadi lunas
         $rsv->update([
-            'status_dp' => 'lunas',
+            'status_dp' => 'disetujui',
             'status'    => 'Sudah DP' 
         ]);
 
@@ -80,28 +83,39 @@ class KeuanganController extends Controller
         // Ubah status DP dan status utama menjadi ditolak
         $rsv->update([
             'status_dp' => 'ditolak',
-            'status'    => 'Ditolak Admin' 
+            'status'    => 'DP Ditolak' 
         ]);
 
         return back()->with('success', 'Pembayaran DP atas nama ' . $rsv->nama_pemohon . ' berhasil ditolak.');
     }
 
+    // === FUNGSI LAPORAN ===
+    // Berfungsi mengelompokkan total transaksi per kategori agar grafik/tabel lebih rapi
     public function laporan(Request $request)
     {
         $bulan = $request->bulan;
         $tahun = $request->tahun;
 
         if ($bulan && $tahun) {
-            // Per bulan → jabarkan semua transaksi
-            $pemasukan   = Transaksi::with('kategori')->where('jenis', 'pemasukan')
-                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get();
+            $pemasukan = Transaksi::with('kategori')->where('jenis', 'pemasukan')
+                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get()
+                ->groupBy('kategori_id')
+                ->map(fn($group) => (object)[
+                    'kategori' => $group->first()->kategori,
+                    'nominal'  => $group->sum('nominal'),
+                ])->values();
+
             $pengeluaran = Transaksi::with('kategori')->where('jenis', 'pengeluaran')
-                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get();
-            $periode = Carbon::create($tahun, $bulan)->translatedFormat('F Y');
+                ->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get()
+                ->groupBy('kategori_id')
+                ->map(fn($group) => (object)[
+                    'kategori' => $group->first()->kategori,
+                    'nominal'  => $group->sum('nominal'),
+                ])->values();
+            $periode   = Carbon::create($tahun, $bulan)->translatedFormat('F Y');
             $ringkasan = false;
 
         } else {
-            // Semua periode → group by kategori, tampil total per kategori saja
             $pemasukan = Transaksi::with('kategori')->where('jenis', 'pemasukan')
                 ->get()
                 ->groupBy('kategori_id')
@@ -118,7 +132,7 @@ class KeuanganController extends Controller
                     'nominal' => $group->sum('nominal'),
                 ])->values();
 
-            $periode  = 'Semua Periode';
+            $periode   = 'Semua Periode';
             $ringkasan = true;
         }
 
@@ -127,35 +141,45 @@ class KeuanganController extends Controller
             'ringkasan'        => $ringkasan,
             'pemasukan'        => $pemasukan,
             'pengeluaran'      => $pengeluaran,
-            'totalPemasukan'   => $pemasukan instanceof \Illuminate\Support\Collection ? $pemasukan->sum('nominal') : $pemasukan->sum('nominal'),
-            'totalPengeluaran' => $pengeluaran instanceof \Illuminate\Support\Collection ? $pengeluaran->sum('nominal') : $pengeluaran->sum('nominal'),
+            'totalPemasukan'   => $pemasukan->sum('nominal'),
+            'totalPengeluaran' => $pengeluaran->sum('nominal'),
             'surplus'          => $pemasukan->sum('nominal') - $pengeluaran->sum('nominal'),
         ]);
     }
 
+    // === FUNGSI TAMBAH MANUAL ===
     public function tambahManual(Request $request)
     {
-        // 1. Simpan data transaksi ke tabel transaksis
+        // 1. Proses Upload File Bukti Bayar
+        $buktiBayar = null;
+        if ($request->hasFile('bukti_bayar')) {
+            $buktiBayar = $request->file('bukti_bayar')->store('bukti_transaksi', 'public');
+        }
+
+        // 2. Simpan data transaksi ke tabel transaksis
         $transaksi = Transaksi::create([
             'tanggal'      => $request->tanggal,
             'jenis'        => $request->jenis,
             'kategori_id'  => $request->kategori_id,
-            'reservasi_id' => $request->reservasi_id, 
+            'reservasi_id' => $request->reservasi_id ?: null, 
             'nominal'      => $request->nominal,
             'keterangan'   => $request->keterangan ?? 'Transaksi Manual',
             'sumber'       => 'manual',
+            'bukti_bayar'  => $buktiBayar,
         ]);
 
         $pesanTambahan = '';
 
-        // 2. Logika Pelunasan / Cicilan
+        // 3. Logika Pelunasan / Cicilan 
         if ($request->filled('reservasi_id')) {
             $rsv = Reservasi::with('transaksis')->find($request->reservasi_id);
             
             if ($rsv) {
+                // Hitung semua transaksi pemasukan yang terikat dengan ID reservasi ini
                 $totalDibayar = $rsv->transaksis->where('jenis', 'pemasukan')->sum('nominal');
                 $grandTotal = $rsv->grand_total; 
                 
+                // Jika total yang dibayar sudah memenuhi atau melebihi tagihan
                 if ($totalDibayar >= $grandTotal) {
                     $rsv->update([
                         'status_dp' => 'lunas',
@@ -182,5 +206,24 @@ class KeuanganController extends Controller
     {
         KategoriKeuangan::findOrFail($id)->delete();
         return back()->with('success', 'Kategori berhasil dihapus.');
+    }
+
+    public function updateTransaksi(Request $request, $id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+
+        $transaksi->update([
+            'nominal'     => $request->nominal,
+            'keterangan'  => $request->keterangan,
+            'kategori_id' => $request->kategori_id,
+            'tanggal'     => $request->tanggal,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Transaksi berhasil diperbarui.']);
+    }
+    public function hapusTransaksi($id)
+    {
+        Transaksi::findOrFail($id)->delete();
+        return response()->json(['success' => true]);
     }
 }

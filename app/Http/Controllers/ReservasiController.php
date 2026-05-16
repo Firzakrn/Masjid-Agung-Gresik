@@ -16,7 +16,6 @@ class ReservasiController extends Controller
         $paket = $request->query('paket', 'Paket Belum Dipilih');
 
         // 1. Ambil semua reservasi dari database (kecuali yang dibatalkan)
-        // Pastikan model Reservasi sudah di-import di atas: use App\Models\Reservasi;
         $reservasis = Reservasi::where('status', '!=', 'Batal')->get();
 
         $bookedDates = [];

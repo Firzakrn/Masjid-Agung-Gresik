@@ -102,32 +102,33 @@
         document.getElementById('btnTampilkanLaporan').addEventListener('click', function () {
             const bulan = document.getElementById('filterBulan').value;
             const tahun = document.getElementById('filterTahun').value;
-                fetch(`{{ route('public.keuangan.laporan') }}?bulan=${bulan}&tahun=${tahun}`)
+
+            // Panggil fungsi laporan di KeuanganController yang sudah kita buat
+            fetch(`{{ route('public.keuangan.laporan') }}?bulan=${bulan}&tahun=${tahun}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('labelPeriode').textContent = 'Periode: ' + data.periode;
 
-                    // Tampilkan Pemasukan
                     const listIn = document.getElementById('listPemasukan');
-                    listIn.innerHTML = data.pemasukan.length > 0 
-                        ? data.pemasukan.map(t => `
-                            <div class="flex justify-between text-gray-700 border-b border-gray-100 pb-3">
-                                <span>${t.kategori ? t.kategori.nama : 'Lain-lain'}</span>
-                                <span class="font-medium">${formatRupiah(t.total_nominal)}</span>
-                            </div>
-                        `).join('')
-                        : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada penerimaan.</p>';
+                listIn.innerHTML = data.pemasukan.length > 0 
+                    ? data.pemasukan.map(t => `
+                        <div class="flex justify-between text-gray-700 border-b border-gray-100 pb-3">
+                            <span>${t.kategori ? t.kategori.nama : 'Lain-lain'}</span>
+                            <span class="font-medium">${formatRupiah(t.nominal)}</span>
+                        </div>
+                    `).join('')
+                    : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada penerimaan.</p>';
 
-                    // Tampilkan Pengeluaran
-                    const listOut = document.getElementById('listPengeluaran');
-                    listOut.innerHTML = data.pengeluaran.length > 0 
-                        ? data.pengeluaran.map(t => `
-                            <div class="flex justify-between text-gray-700 border-b border-gray-100 pb-3">
-                                <span>${t.kategori ? t.kategori.nama : 'Lain-lain'}</span>
-                                <span class="font-medium">${formatRupiah(t.total_nominal)}</span>
-                            </div>
-                        `).join('')
-                        : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada pengeluaran.</p>';
+                // Tampilkan Pengeluaran
+                const listOut = document.getElementById('listPengeluaran');
+                listOut.innerHTML = data.pengeluaran.length > 0 
+                    ? data.pengeluaran.map(t => `
+                        <div class="flex justify-between text-gray-700 border-b border-gray-100 pb-3">
+                            <span>${t.kategori ? t.kategori.nama : 'Lain-lain'}</span>
+                            <span class="font-medium">${formatRupiah(t.nominal)}</span>
+                        </div>
+                    `).join('')
+                    : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada pengeluaran.</p>';
 
                     // Update Ringkasan Total
                     document.getElementById('totalPemasukan').textContent = formatRupiah(data.totalPemasukan);
