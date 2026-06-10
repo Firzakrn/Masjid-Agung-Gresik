@@ -71,7 +71,8 @@ class AuthController extends Controller
             'role'     => 'jamaah',
         ]);
 
-        event(new Registered($user));
+        // FITUR VERIFIKASI EMAIL, DAFTAR SMTP GMAIL DAN TAMBAHKAN FUNGSINYA PADA .env
+        // event(new Registered($user));
 
         return redirect()->route('login')->with('cek_email', 'Alhamdulillah, akun berhasil dibuat! Silakan cek kotak masuk Email Anda untuk mengaktifkan akun sebelum Masuk.');
     }

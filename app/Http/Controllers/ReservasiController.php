@@ -382,7 +382,6 @@ class ReservasiController extends Controller
             ]);
         } elseif (str_starts_with($orderId, 'RSV-')) {
             // === JALUR MIDTRANS OTOMATIS ===
-            // Data baru dimunculkan ke Admin setelah pembayaran sukses
             $reservasi->update([
                 'status_dp' => 'menunggu',
                 'status'    => 'Menunggu Verifikasi Admin',
@@ -394,12 +393,26 @@ class ReservasiController extends Controller
             if ($reservasi->status === 'Menunggu Pembayaran DP') {
                 $reservasi->update([
                     'status_dp' => 'menunggu',
-                    'status'    => 'Menunggu Verifikasi Admin', // Munculkan ke Admin!
+                    'status'    => 'Menunggu Verifikasi Admin', 
                 ]);
             }
         }
 
         return redirect('/')->with('welcome', 'Alhamdulillah! Proses selesai. Menunggu konfirmasi Admin.');
+    }
+
+    public function konfirmasiWa($id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+
+        $reservasi->update([
+            'status'    => 'Pelunasan Menunggu Verifikasi',
+            'status_dp' => 'dp_lunas_pending'
+        ]);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
     // --------------------------------------------------------

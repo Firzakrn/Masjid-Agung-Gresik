@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // SNAP TOKEN UNTUK PELUNASAN (Memanggil fungsi snapTokenLunas)
     Route::post('/reservasi/snap-token-lunas/{id}', [ReservasiController::class, 'snapTokenLunas'])->name('reservasi.snap-token-lunas');
+    Route::post('/reservasi/konfirmasi-wa/{id}', [ReservasiController::class, 'konfirmasiWa'])->name('reservasi.konfirmasi-wa');
 
     Route::get('/reservasi/check-status/{id}', [ReservasiController::class, 'checkStatus'])->name('reservasi.check-status');
     Route::post('/reservasi/{id}/upload-dp', [ReservasiController::class, 'uploadBuktiDp'])->name('reservasi.uploadDp');

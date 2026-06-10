@@ -119,16 +119,27 @@
                                     <li>Masukkan nominal tepat: <span class="font-bold text-green-700">Rp {{ number_format($sisaBayar, 0, ',', '.') }}</span></li>
                                     <li>Kirim bukti transfer ke WhatsApp Admin.</li>
                                 </ul>
-
                                 @php
                                     $noWaAdmin = "6281216978686";
-                                    $pesanWa = "Assalamualaikum Admin,\nSaya ingin konfirmasi PELUNASAN Reservasi.\n\n*Nama:* " . $reservasi->nama_pemohon . "\n*Paket:* " . $reservasi->paket . "\n*Tanggal Acara:* " . $reservasi->tanggal . "\n*Nominal Pelunasan:* Rp " . number_format($sisaBayar, 0, ',', '.') . "\n\nBerikut saya lampirkan bukti transfernya.";
-                                    $linkWa = "https://wa.me/" . $noWaAdmin . "?text=" . urlencode($pesanWa);
-                                @endphp
 
-                                <a href="{{ $linkWa }}" target="_blank" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold py-2.5 px-5 rounded-xl transition shadow-md shadow-green-200 mb-4">
-                                    <i class="fa-brands fa-whatsapp text-lg"></i> Konfirmasi via WhatsApp
-                                </a>
+                                    $pesanWa =
+                                        "Assalamualaikum Admin,\n".
+                                        "Saya ingin konfirmasi PELUNASAN Reservasi.\n\n".
+                                        "*Nama:* {$reservasi->nama_pemohon}\n".
+                                        "*Paket:* {$reservasi->paket}\n".
+                                        "*Tanggal Acara:* {$reservasi->tanggal}\n".
+                                        "*Nominal Pelunasan:* Rp ".number_format($sisaBayar,0,',','.')."\n\n".
+                                        "Berikut saya lampirkan bukti transfernya.";
+
+                                    $linkWa = "https://wa.me/".$noWaAdmin."?text=".urlencode($pesanWa);
+                                @endphp
+                               <button
+                                    type="button"
+                                    onclick="konfirmasiWa()"
+                                    class="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold py-2.5 px-5 rounded-xl transition">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                    Konfirmasi via WhatsApp
+                                </button>
 
                                 <div class="bg-blue-50 text-blue-700 text-xs p-3 rounded-lg border border-blue-100 flex gap-2 items-start mt-2">
                                     <i class="fa-solid fa-circle-info mt-0.5"></i>
@@ -238,6 +249,29 @@
                         this.loading  = false;
                     }
                 },
+            }
+        }
+
+        async function konfirmasiWa() {
+
+            window.open(
+                'https://wa.me/6281216978686?text={{ urlencode($pesanWa) }}',
+                '_blank'
+            );
+
+            try {
+                await fetch('{{ route("reservasi.konfirmasi-wa",$reservasi->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                window.location.href = '/';
+
+            } catch (e) {
+                alert('Gagal mengirim konfirmasi');
             }
         }
     </script>

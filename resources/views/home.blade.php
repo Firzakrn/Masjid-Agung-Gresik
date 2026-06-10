@@ -120,6 +120,12 @@
     @if(session('welcome'))
         <script>
             alert("{{ session('welcome') }}");
+            
+        </script>
+    @endif
+    @if(session('wa_link'))
+        <script>
+            window.open("{{ session('wa_link') }}", "_blank");
         </script>
     @endif
 </body>
