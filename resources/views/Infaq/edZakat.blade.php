@@ -6,7 +6,6 @@
     <title>Edukasi Zakat | Masjid Agung Gresik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Font Arab & Font Utama -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
@@ -19,7 +18,7 @@
 
     @include('navbar')
 
-    <!-- ================= 1. HERO SECTION (FOTO 1) ================= -->
+    <!-- ================= HEADER SECTION ================= -->
     <section class="relative w-full h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
             <img src="https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Masjid Interior">
@@ -46,7 +45,6 @@
 
         <!-- 1 & 2: PENGERTIAN & DASAR HUKUM -->
         <section class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
-            <!-- Teks -->
             <div class="md:col-span-7 bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
                 <div class="mb-10">
                     <h2 class="text-3xl font-extrabold text-emerald-800 mb-6 flex items-center gap-3">
@@ -86,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- FOTO 2: Al-Quran/Orang Berdoa -->
             <div class="md:col-span-5 flex flex-col gap-8">
                 <div class="rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 h-64 md:h-full relative group">
                     <img src="https://images.unsplash.com/photo-1771493003867-1aa55f96df5d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="Al-Quran">
@@ -132,7 +129,6 @@
                 </blockquote>
             </div>
 
-            <!-- FOTO 3: Jenis Zakat -->
             <div class="order-1 md:order-2">
                 <div class="relative rounded-[2.5rem] overflow-hidden shadow-xl h-full min-h-[300px]">
                     <img src="https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover" alt="Uang/Zakat">
@@ -180,7 +176,6 @@
                 <p class="text-slate-500 font-medium">(QS. At-Taubah: 60)</p>
             </div>
 
-            <!-- FOTO 4: Mustahiq/Tangan Memberi disamping Grid 8 Golongan -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-5 h-[400px] rounded-[2.5rem] overflow-hidden shadow-lg relative">
                     <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Memberi Zakat">
@@ -247,7 +242,7 @@
             </div>
         </section>
 
-        <!-- 9 & 10: KESIMPULAN & CALL TO ACTION (FOTO 5) -->
+        <!-- 9 & 10: KESIMPULAN & CALL TO ACTION -->
         <section class="relative rounded-[3rem] overflow-hidden shadow-2xl">
             <!-- FOTO 5: CTA Background -->
             <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover" alt="Interior Masjid">
@@ -276,7 +271,7 @@
         </section>
 
     </main>
-    @include('Infaq.zakat')
+    @include('infaq.zakat')
     @include('footer')
     <script>
         function zisApp() {

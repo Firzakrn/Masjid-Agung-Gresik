@@ -22,12 +22,10 @@
                     @forelse($riwayat as $trx)
                     <tr class="hover:bg-slate-50 transition baris-detail group" data-nama="{{ $trx->kategori->nama ?? '' }}">
 
-                        {{-- Tanggal --}}
                         <td class="px-6 py-4 text-slate-500">
                             {{ \Carbon\Carbon::parse($trx->tanggal)->translatedFormat('d M Y') }}
                         </td>
 
-                        {{-- No Reservasi --}}
                         <td class="px-6 py-4 text-slate-600 whitespace-nowrap">
                             @if($trx->reservasi_id)
                                 <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono text-xs font-bold whitespace-nowrap">
@@ -38,7 +36,6 @@
                             @endif
                         </td>
 
-                        {{-- Nama — hijau untuk semua pemasukan, merah untuk pengeluaran --}}
                         <td class="px-6 py-4">
                             @if($trx->reservasi_id)
                                 @if($trx->jenis === 'pemasukan')
@@ -68,17 +65,14 @@
                             @endif
                         </td>
 
-                        {{-- Kategori --}}
                         <td class="px-6 py-4 font-bold text-slate-800">
                             {{ $trx->kategori->nama ?? '-' }}
                         </td>
 
-                        {{-- Keterangan --}}
                         <td class="px-6 py-4 text-slate-600 max-w-xs truncate">
                             {{ $trx->keterangan }}
                         </td>
 
-                        {{-- Jenis --}}
                         <td class="px-6 py-4">
                             @if($trx->jenis === 'pemasukan')
                                 <span class="bg-green-100 text-green-700 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Masuk</span>
@@ -87,18 +81,16 @@
                             @endif
                         </td>
 
-                        {{-- Nominal --}}
                         <td class="px-6 py-4 font-bold whitespace-nowrap {{ $trx->jenis === 'pemasukan' ? 'text-green-600' : 'text-red-500' }}">
                             {{ $trx->jenis === 'pengeluaran' ? '(' : '' }}
                             Rp {{ number_format($trx->nominal, 0, ',', '.') }}
                             {{ $trx->jenis === 'pengeluaran' ? ')' : '' }}
                         </td>
 
-                        {{-- Kolom Bukti --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($trx->bukti_bayar)
-                                <button
-                                    onclick="lihatBukti('{{ Storage::url($trx->bukti_bayar) }}', '{{ pathinfo($trx->bukti_bayar, PATHINFO_EXTENSION) }}')"
+                                <button type="button"
+                                    onclick="lihatBukti('/{{ $trx->bukti_bayar }}', '{{ pathinfo($trx->bukti_bayar, PATHINFO_EXTENSION) }}')"
                                     class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">
                                     <i class="fa-solid fa-eye text-xs"></i> Lihat Bukti
                                 </button>
@@ -107,7 +99,6 @@
                             @endif
                         </td>
 
-                        {{-- Aksi --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 @if(!$trx->reservasi_id)
@@ -161,12 +152,9 @@
             </button>
         </div>
         <div class="flex-1 overflow-auto flex items-center justify-center p-4 bg-slate-50">
-            {{-- Gambar --}}
             <img id="buktiGambar" src="" alt="Bukti Transfer"
                  class="hidden max-w-full max-h-[65vh] rounded-xl shadow object-contain">
-            {{-- PDF --}}
             <iframe id="buktiPdf" src="" class="hidden w-full h-[65vh] rounded-xl border border-slate-200"></iframe>
-            {{-- Fallback --}}
             <div id="buktiFallback" class="hidden text-center text-slate-500">
                 <i class="fa-solid fa-file text-5xl mb-3 text-slate-300"></i>
                 <p class="text-sm">Format file tidak dapat ditampilkan.</p>
@@ -243,17 +231,11 @@
 
 @push('scripts')
 <script>
-    // ============================================================
-    // DATA KATEGORI
-    // ============================================================
     const _kategoriRiwayat = {
         pemasukan:   @json($kategoriPemasukan),
         pengeluaran: @json($kategoriPengeluaran),
     };
 
-    // ============================================================
-    // MODAL LIHAT BUKTI
-    // ============================================================
     function lihatBukti(url, ext) {
         const gambar   = document.getElementById('buktiGambar');
         const pdf      = document.getElementById('buktiPdf');
@@ -293,9 +275,6 @@
         if (e.target === this) tutupModalBukti();
     });
 
-    // ============================================================
-    // PARSE KETERANGAN
-    // ============================================================
     function parseKeteranganRiwayat(keterangan) {
         let ket = keterangan ?? '';
         let nama = '';
@@ -320,9 +299,6 @@
 
     let _jenisAktifRiwayat = 'pemasukan';
 
-    // ============================================================
-    // MODAL EDIT
-    // ============================================================
     function bukaModalEditRiwayat(id, tanggal, kategoriId, nominal, keterangan, jenis) {
         _jenisAktifRiwayat = jenis;
         document.getElementById('editRiwayatId').value      = id;
@@ -355,9 +331,6 @@
         if (e.target === this) tutupModalEditRiwayat();
     });
 
-    // ============================================================
-    // SIMPAN EDIT
-    // ============================================================
     function simpanEditRiwayat() {
         const id           = document.getElementById('editRiwayatId').value;
         const keteranganEl = document.getElementById('editRiwayatKeterangan').value.trim();
@@ -398,9 +371,6 @@
         });
     }
 
-    // ============================================================
-    // HAPUS TRANSAKSI
-    // ============================================================
     function hapusTransaksiRiwayat(id) {
         if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
 
@@ -423,9 +393,6 @@
         });
     }
 
-    // ============================================================
-    // EVENT DELEGATION
-    // ============================================================
     document.addEventListener('click', function (e) {
         const btnEdit = e.target.closest('.btn-edit-riwayat');
         if (btnEdit) {
@@ -440,9 +407,6 @@
         }
     });
 
-    // ============================================================
-    // LIVE SEARCH
-    // ============================================================
     function cariPemohon() {
         let inputEl = document.getElementById("searchInput");
         if (!inputEl) return;

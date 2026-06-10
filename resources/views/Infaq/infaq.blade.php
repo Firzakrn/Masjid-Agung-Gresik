@@ -38,7 +38,6 @@
     {{-- AREA SCROLL --}}
     <div class="overflow-y-auto flex-1 pb-10">
 
-        {{-- HEADER HIJAU --}}
         <div class="w-full bg-green-700 py-10 relative overflow-hidden">
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 text-center">
@@ -60,7 +59,6 @@
                     <form action="{{ route('zis.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        {{-- Nama Lengkap --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Nama Lengkap <span class="text-red-500">*</span>
@@ -78,15 +76,12 @@
                             </div>
                         </div>
 
-                        {{-- Jenis Dana --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-3">
                                 Jenis Dana / Penyaluran <span class="text-red-500">*</span>
                             </label>
 
-                            {{-- Pilihan Kategori Visual --}}
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4" id="kategori-infaq-group">
-                                {{-- Infaq Fakir Miskin --}}
                                 <label class="kategori-card cursor-pointer" for="cat-fakir">
                                     <input type="radio" name="jenis_dana" id="cat-fakir"
                                            value="Infaq Fakir Miskin" required class="sr-only"
@@ -103,7 +98,6 @@
                                     </div>
                                 </label>
 
-                                {{-- Infaq Masjid --}}
                                 <label class="kategori-card cursor-pointer" for="cat-masjid">
                                     <input type="radio" name="jenis_dana" id="cat-masjid"
                                            value="Infaq Masjid" class="sr-only"
@@ -120,7 +114,6 @@
                                     </div>
                                 </label>
 
-                                {{-- Infaq Anak Yatim --}}
                                 <label class="kategori-card cursor-pointer" for="cat-yatim">
                                     <input type="radio" name="jenis_dana" id="cat-yatim"
                                            value="Infaq Anak Yatim Piatu" class="sr-only"
@@ -138,11 +131,9 @@
                                 </label>
                             </div>
 
-                            {{-- Fallback select tersembunyi untuk validasi --}}
                             <p id="kategori-error" class="text-xs text-red-500 mt-1 hidden">Silakan pilih jenis penyaluran terlebih dahulu.</p>
                         </div>
 
-                        {{-- Nominal --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Nominal (Rp) <span class="text-red-500">*</span>
@@ -176,7 +167,6 @@
                             <p class="text-xs text-slate-400 mt-2">*Minimum infaq Rp 10.000,-</p>
                         </div>
 
-                        {{-- Keterangan --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Keterangan
@@ -187,7 +177,6 @@
                                       class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none transition resize-none"></textarea>
                         </div>
 
-                        {{-- Upload Bukti Transfer --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Bukti Transfer <span class="text-red-500">*</span>
@@ -203,7 +192,6 @@
                                    accept="image/*,.pdf" required class="hidden"
                                    onchange="previewFile(event)">
 
-                            {{-- Preview File --}}
                             <div id="preview-area" class="hidden mt-3 flex items-center gap-3 border border-slate-200 rounded-xl p-3 bg-white">
                                 <img id="preview-img" src="" alt="preview" class="w-12 h-12 object-cover rounded-lg hidden">
                                 <i id="preview-icon" class="fa-solid fa-file-pdf text-3xl text-red-400 hidden"></i>
@@ -218,7 +206,6 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Submit --}}
                         <button type="submit" onclick="return validasiForm(event)"
                                 class="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center justify-center gap-2">
                             Kirim Pembayaran <i class="fa-solid fa-paper-plane"></i>
@@ -227,10 +214,9 @@
                     </form>
                 </div>
 
-                {{-- KOLOM KANAN --}}
+                {{-- KOLOM KANAN: PEMBAYARAN --}}
                 <div class="lg:col-span-5 space-y-6">
 
-                    {{-- Card QRIS & Rekening --}}
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 text-center">
                         <div class="inline-block bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
                             <i class="fa-solid fa-qrcode mr-1"></i> Scan QRIS
@@ -247,7 +233,6 @@
                         </div>
                     </div>
 
-                    {{-- Card Cara Berinfaq --}}
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                         <h3 class="text-base font-bold text-green-800 mb-5 flex items-center gap-2 border-b border-slate-100 pb-3">
                             <i class="fa-solid fa-circle-info text-green-500"></i> Cara Berinfaq via QRIS
@@ -285,7 +270,6 @@
                     </div>
 
                 </div>
-                {{-- END KOLOM KANAN --}}
 
             </div>
         </div>
@@ -331,16 +315,13 @@
     }
 
     function pilihKategori(radio) {
-        // Reset semua box
         document.querySelectorAll('.kategori-box').forEach(box => {
             box.classList.remove('border-green-500', 'bg-green-50', 'shadow-md');
             box.classList.add('border-slate-200', 'bg-slate-50');
         });
-        // Aktifkan yang dipilih
         const box = radio.closest('.kategori-card').querySelector('.kategori-box');
         box.classList.add('border-green-500', 'bg-green-50', 'shadow-md');
         box.classList.remove('border-slate-200', 'bg-slate-50');
-        // Sembunyikan error jika ada
         document.getElementById('kategori-error').classList.add('hidden');
     }
 

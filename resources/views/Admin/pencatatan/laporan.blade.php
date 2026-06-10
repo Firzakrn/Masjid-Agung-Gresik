@@ -23,9 +23,8 @@
         <button id="btnTampilkanLaporan" class="bg-slate-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition w-full md:w-auto">Tampilkan</button>
     </div>
 
-    <!-- KERTAS LAPORAN -->
+    <!-- LAPORAN -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 relative overflow-hidden">
-        {{-- Watermark Ikon Masjid --}}
         <i class="fa-solid fa-mosque absolute text-[200px] text-slate-50 -right-10 -bottom-10 opacity-50 pointer-events-none"></i>
         
         <div class="text-center border-b-2 border-slate-800 pb-4 mb-8 relative z-10">
@@ -65,9 +64,6 @@
 
 @push('scripts')
 <script>
-    // ============================================================
-    // LOGIKA LAPORAN ARUS KAS (AJAX FETCH)
-    // ============================================================
     function muatLaporan(bulan = null, tahun = null) {
         const url = bulan && tahun
             ? `{{ route('admin.keuangan.laporan') }}?bulan=${bulan}&tahun=${tahun}`
@@ -81,7 +77,6 @@
                 const listIn  = document.getElementById('listPemasukan');
                 const listOut = document.getElementById('listPengeluaran');
 
-                // Render List Pemasukan
                 listIn.innerHTML = data.pemasukan.length > 0
                     ? data.pemasukan.map(t => {
                         const nama = data.ringkasan ? t.nama : (t.kategori?.nama ?? '-');
@@ -95,7 +90,6 @@
                     }).join('')
                     : '<p class="text-slate-400 text-sm italic">Tidak ada pemasukan.</p>';
 
-                // Render List Pengeluaran
                 listOut.innerHTML = data.pengeluaran.length > 0
                     ? data.pengeluaran.map(t => {
                         const nama = data.ringkasan ? t.nama : (t.kategori?.nama ?? '-');
@@ -109,11 +103,9 @@
                     }).join('')
                     : '<p class="text-slate-400 text-sm italic">Tidak ada pengeluaran.</p>';
 
-                // Update Total
                 document.getElementById('totalPemasukan').textContent = formatRupiah(data.totalPemasukan);
                 document.getElementById('totalPengeluaran').textContent = '( ' + formatRupiah(data.totalPengeluaran) + ' )';
 
-                // Update Surplus
                 const surplusEl = document.getElementById('surplus');
                 surplusEl.textContent = formatRupiah(data.surplus);
                 surplusEl.className = data.surplus >= 0 ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
@@ -124,14 +116,12 @@
             });
     }
 
-    // Trigger Fetch saat tombol Tampilkan Filter diklik
     document.getElementById('btnTampilkanLaporan').addEventListener('click', function () {
         const bulan = document.getElementById('filterBulan').value;
         const tahun = document.getElementById('filterTahun').value;
         muatLaporan(bulan, tahun);
     });
 
-    // Otomatis load data AJAX saat tab menu Laporan di navigasi atas diklik
     document.getElementById('btnLaporan').addEventListener('click', function() {
         muatLaporan();
     });

@@ -9,7 +9,6 @@ class Pembayaran extends Model
 {
     use HasFactory;
 
-    // Kolom yang diizinkan untuk diisi data
     protected $fillable = [
         'kode_reservasi',
         'reservasi_id',
@@ -19,7 +18,6 @@ class Pembayaran extends Model
         'bukti_transfer'
     ];
 
-    // Relasi: Setiap 1 Pembayaran itu MILIK (belongsTo) 1 Reservasi
     public function reservasi()
     {
         return $this->belongsTo(Reservasi::class);

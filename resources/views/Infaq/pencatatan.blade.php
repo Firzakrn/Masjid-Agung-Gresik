@@ -19,7 +19,6 @@
             <div class="w-24 h-1 bg-green-600 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <!-- FILTER PERIODE -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center mb-8 justify-center">
             <span class="text-sm font-bold text-gray-600"><i class="fa-solid fa-calendar-days text-green-600 mr-2"></i>Periode Laporan:</span>
             <select id="filterBulan" class="bg-gray-50 border border-gray-300 px-4 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-600 w-full md:w-48 font-medium">
@@ -43,20 +42,16 @@
             <button id="btnTampilkanLaporan" class="bg-green-700 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-green-800 transition w-full md:w-auto shadow-md">Tampilkan</button>
         </div>
 
-        <!-- KONTEN LAPORAN -->
         <div class="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-14">
             <div class="text-center border-b-4 border-double border-green-800 pb-8 mb-10">
                 <img src="{{ asset('images/logoo.png') }}" alt="Logo Masjid" class="h-20 mx-auto mb-4 drop-shadow-sm">
                 <h2 class="text-2xl font-bold uppercase tracking-wider text-gray-800">Laporan Penerimaan & Pengeluaran Kas</h2>
                 <h3 class="text-xl font-bold text-green-700 mt-1">Masjid Agung Gresik</h3>
-                <!-- ID PERIODE -->
                 <p id="labelPeriode" class="text-sm text-gray-500 mt-2 font-medium">Pilih periode untuk melihat data</p>
             </div>
 
-            <!-- PENERIMAAN -->
             <div class="mb-10">
                 <h4 class="font-bold text-lg text-white bg-green-700 px-5 py-3 rounded-t-xl shadow-sm mb-4"><i class="fa-solid fa-arrow-down mr-2"></i> A. PENERIMAAN (PER KATEGORI)</h4>
-                <!-- ID LIST PEMASUKAN -->
                 <div id="listPemasukan" class="space-y-3 px-2 md:px-5"></div>
                 <div class="flex justify-between items-center mt-5 px-5 py-4 bg-green-50 rounded-xl border border-green-200 font-bold text-green-900">
                     <span>TOTAL PENERIMAAN</span>
@@ -64,10 +59,8 @@
                 </div>
             </div>
 
-            <!-- PENGELUARAN -->
             <div class="mb-10">
                 <h4 class="font-bold text-lg text-white bg-red-600 px-5 py-3 rounded-t-xl shadow-sm mb-4"><i class="fa-solid fa-arrow-up mr-2"></i> B. PENGELUARAN (PER KATEGORI)</h4>
-                <!-- ID LIST PENGELUARAN -->
                 <div id="listPengeluaran" class="space-y-3 px-2 md:px-5"></div>
                 <div class="flex justify-between items-center mt-5 px-5 py-4 bg-red-50 rounded-xl border border-red-200 font-bold text-red-800">
                     <span>TOTAL PENGELUARAN</span>
@@ -75,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- SALDO AKHIR -->
             <div class="flex flex-col sm:flex-row justify-between items-center border-t-4 border-double border-green-800 pt-8 px-6 md:px-8 text-2xl font-black text-gray-900 bg-green-50/30 rounded-b-2xl py-8 mt-12 shadow-sm">
                 <span class="mb-2 sm:mb-0 uppercase">Saldo Akhir (Surplus)</span>
                 <span id="surplus" class="text-green-700 text-3xl">Rp 0</span>
@@ -103,7 +95,6 @@
             const bulan = document.getElementById('filterBulan').value;
             const tahun = document.getElementById('filterTahun').value;
 
-            // Panggil fungsi laporan di KeuanganController yang sudah kita buat
             fetch(`{{ route('public.keuangan.laporan') }}?bulan=${bulan}&tahun=${tahun}`)
                 .then(res => res.json())
                 .then(data => {
@@ -119,7 +110,6 @@
                     `).join('')
                     : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada penerimaan.</p>';
 
-                // Tampilkan Pengeluaran
                 const listOut = document.getElementById('listPengeluaran');
                 listOut.innerHTML = data.pengeluaran.length > 0 
                     ? data.pengeluaran.map(t => `
@@ -130,7 +120,6 @@
                     `).join('')
                     : '<p class="text-gray-400 text-sm italic text-center py-4">Belum ada pengeluaran.</p>';
 
-                    // Update Ringkasan Total
                     document.getElementById('totalPemasukan').textContent = formatRupiah(data.totalPemasukan);
                     document.getElementById('totalPengeluaran').textContent = formatRupiah(data.totalPengeluaran);
                     
@@ -141,7 +130,6 @@
                 .catch(err => alert("Gagal mengambil data laporan."));
         });
 
-        // Jalankan otomatis saat halaman pertama kali dibuka
         window.onload = () => document.getElementById('btnTampilkanLaporan').click();
     </script>
     

@@ -82,19 +82,11 @@
         const encodedText = encodeURIComponent(textShare);
         const encodedUrl = encodeURIComponent(urlHome);
 
-        // 1. WhatsApp
         document.getElementById('share-wa').href = `https://wa.me/?text=${encodedText}${encodedUrl}`;
-
-        // 2. Twitter / X
         document.getElementById('share-tw').href = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-
-        // 3. Facebook
         document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
-
-        // 4. Instagram (Copy to Clipboard)
         document.getElementById('share-ig').addEventListener('click', function(e) {
             e.preventDefault();
-            // Gabungkan teks dan URL untuk dicopy
             const fullText = textShare + urlHome;
             
             navigator.clipboard.writeText(fullText).then(() => {

@@ -12,11 +12,10 @@
             padding: 50px 20px;
         }
         .card {
-            max-width: 650px; /* Sedikit dilebarkan agar header terlihat lebih panjang */
+            max-width: 650px; 
             margin: 0 auto;
             background-color: #ffffff;
             border-radius: 20px;
-            /* Efek shadow berlapis agar terlihat benar-benar ngambang/melayang */
             box-shadow: 0 20px 40px rgba(0,0,0,0.12), 0 5px 15px rgba(0,0,0,0.06);
             overflow: hidden;
         }
@@ -26,18 +25,17 @@
             text-align: center;
             padding: 35px 20px;
         }
-        /* Container untuk menyejajarkan logo dan teks di tengah */
         .header-container {
             display: inline-block;
             text-align: left;
             vertical-align: middle;
         }
         .logo-img {
-            height: 55px; /* Mengatur tinggi logo */
+            height: 55px;
             width: auto;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 15px; /* Jarak antara logo dan teks h1 */
+            margin-right: 15px; 
         }
         .header h1 {
             margin: 0;
@@ -88,7 +86,7 @@
     <div class="card">
         <div class="header">
             <div class="header-container">
-                <img src="https://untaken-panhandle-blustery.ngrok-free.dev/images/logo.png" alt="Logo" class="logo-img">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-img">
                 <h1>Masjid Agung Gresik</h1>
             </div>
         </div>

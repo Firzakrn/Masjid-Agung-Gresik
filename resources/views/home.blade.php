@@ -97,9 +97,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const img1 = document.getElementById('bg-img-1');
             const img2 = document.getElementById('bg-img-2');
-            let isSiang = true; // Status awal gambar 1 (siang) muncul
+            let isSiang = true; 
 
-            // Jalankan ganti gambar setiap 5000 milidetik (5 detik)
             setInterval(() => {
                 if (isSiang) {
                     img1.classList.remove('opacity-100');
@@ -108,14 +107,12 @@
                     img2.classList.remove('opacity-0');
                     img2.classList.add('opacity-100');
                 } else {
-                    // Sembunyikan sore, munculkan siang
                     img2.classList.remove('opacity-100');
                     img2.classList.add('opacity-0');
                     
                     img1.classList.remove('opacity-0');
                     img1.classList.add('opacity-100');
                 }
-                // Balikkan statusnya
                 isSiang = !isSiang;
             }, 5000); 
         });

@@ -52,7 +52,7 @@
             $bgImage = 'majlis.jpg'; 
         } 
 
-        $backUrl = route('reservasi.wedding'); // Default kembali ke menu reservasi
+        $backUrl = route('reservasi.wedding'); 
         if (stripos($paket, 'Workshop') !== false || stripos($paket, 'Wisuda') !== false || stripos($paket, 'Majelis') !== false || stripos($paket, 'Social Event') !== false) {
             $backUrl = route('reservasi.socialevent'); 
         }
@@ -179,10 +179,8 @@
                 </div>
             </div>
 
-            <!-- KOMPONEN KALENDER ALPINE.JS -->
-            <div x-data="calendarData()" x-init="initCalendar()">
-                
-                <!-- Header Kalender -->
+            <!-- KALENDER -->
+            <div x-data="calendarData()" x-init="initCalendar()">                
                 <div class="flex items-center justify-between mb-6">
                     <button @click="changeMonth(-1)" class="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-600 transition">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -193,7 +191,6 @@
                     </button>
                 </div>
 
-                <!-- Grid Kalender -->
                 <div class="grid grid-cols-7 gap-2 mb-4 text-center">
                     <template x-for="day in ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']">
                         <div class="font-bold text-sm text-slate-500 py-2" x-text="day"></div>
@@ -201,12 +198,10 @@
                 </div>
 
                 <div class="grid grid-cols-7 gap-2 gap-y-3">
-                    <!-- Sel kosong sebelum tanggal 1 -->
                     <template x-for="blankday in blankdays">
                         <div class="p-4 border border-transparent rounded-lg"></div>
                     </template>
                     
-                    <!-- Sel Tanggal -->
                     <template x-for="date in no_of_days">
                         <div @click="selectDate(date)" 
                              class="p-4 flex items-center justify-center rounded-lg cursor-pointer transition border"
@@ -248,7 +243,6 @@
                     <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">Pilih Sesi untuk <span x-text="formatSelectedDate()"></span></h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Sesi Pagi -->
                         <button @click="selectSession('pagi')" 
                                 :disabled="hasEvent(selectedDate) === 'pagi' || hasEvent(selectedDate) === 'full'"
                                 class="p-4 rounded-xl border-2 text-left transition relative overflow-hidden"
@@ -271,7 +265,6 @@
                             </div>
                         </button>
                         
-                        <!-- Sesi Malam -->
                         <button @click="selectSession('malam')" 
                                 :disabled="hasEvent(selectedDate) === 'malam' || hasEvent(selectedDate) === 'full'"
                                 class="p-4 rounded-xl border-2 text-left transition relative overflow-hidden"
@@ -296,19 +289,18 @@
                     </div>
                 </div>
 
-                <!-- Form Redirect -->
-                <form action="{{ route('reservasi.formulir') }}" method="GET" x-show="selectedDate && selectedSession">
-                    <input type="hidden" name="paket" value="{{ $paket }}">
+                <form action="{{ route('reservasi.ajukanTanggal') }}" method="POST" x-show="selectedDate && selectedSession">
+                    @csrf <input type="hidden" name="paket" value="{{ $paket }}">
                     <input type="hidden" name="tanggal" :value="formatSelectedDate()">
                     <input type="hidden" name="sesi" :value="selectedSession === 'pagi' ? 'Pagi (07.00 - 12.00 WIB)' : 'Malam (17.00 - 22.00 WIB)'">
                     
                     <button type="submit" class="w-full bg-green-900 text-white p-4 rounded-2xl font-bold text-lg hover:bg-green-600 transition-colors shadow-lg flex justify-center items-center gap-2">
                         @auth
-                            Lanjutkan ke Formulir Data
+                            Ajukan Jadwal & Tunggu ACC
                         @else
                             Login untuk Melanjutkan
                         @endauth
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </form>
 
@@ -329,7 +321,6 @@
                 selectedDate: null,
                 selectedSession: null,
                 
-                // Ambil data asli langsung dari Controller Laravel
                 bookedDates: @json($bookedDates ?? (object)[]),
 
                 initCalendar() {

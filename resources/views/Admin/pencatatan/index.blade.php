@@ -26,7 +26,6 @@
 
         <div class="flex-1 overflow-y-auto relative p-4 md:p-8" id="scrollArea">
 
-            {{-- FLASH MESSAGE --}}
             @if(session('success'))
                 <div class="mb-4 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-xl text-sm font-semibold">
                     <i class="fa-solid fa-circle-check mr-2"></i>{{ session('success') }}
@@ -43,7 +42,6 @@
                 </div>
             @endif
 
-            <!-- HEADER NAVIGASI UTAMA -->
             <div id="mainHeader" class="mb-8 border-b border-slate-200 pb-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
@@ -109,6 +107,20 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($antreanDp as $rsv)
+                                @php
+                                    $isPelunasan = $rsv->status_dp === 'dp_lunas_pending';
+                                    $gt = $rsv->grand_total ?? 0;
+                                    if ($gt == 0) {
+                                        $pkt = strtolower($rsv->paket);
+                                        if (str_contains($pkt, 'intimate wedding')) $gt = 2500000;
+                                        elseif (str_contains($pkt, 'wedding')) $gt = 12500000;
+                                        elseif (str_contains($pkt, 'akad')) $gt = 3000000;
+                                        else $gt = 7500000;
+                                    }
+                                    $sisaLunas = $gt - ($rsv->nominal_dp ?? 0);
+                                    
+                                    $nominalTampil = $isPelunasan ? $sisaLunas : ($rsv->nominal_dp ?? 0);
+                                @endphp
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="px-6 py-4 font-bold text-slate-700">#RSV-{{ $rsv->id }}</td>
                                     <td class="px-6 py-4">
@@ -118,7 +130,11 @@
                                     <td class="px-6 py-4">
                                         <p class="font-bold text-slate-800">{{ $rsv->paket }}</p>
                                         <p class="text-xs text-slate-500">{{ $rsv->tanggal }}</p>
-                                        @if($rsv->status_dp === 'dp_lunas_pending')
+                                        @if($rsv->status === 'Menunggu Konfirmasi Tanggal')
+                                            <span class="inline-block mt-1 bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                KONFIRM TGL
+                                            </span>
+                                        @elseif($rsv->status_dp === 'dp_lunas_pending')
                                             <span class="inline-block mt-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
                                                 PELUNASAN
                                             </span>
@@ -129,23 +145,8 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 font-bold text-green-600 text-base">
-                                        @if($rsv->status_dp === 'dp_lunas_pending')
-                                                @php
-                                                    $gt = $rsv->grand_total ?? 0;
-                                                    if ($gt == 0) {
-                                                        $pkt = strtolower($rsv->paket);
-                                                        if (str_contains($pkt, 'intimate wedding')) $gt = 2500000;
-                                                        elseif (str_contains($pkt, 'wedding')) $gt = 12500000;
-                                                        elseif (str_contains($pkt, 'akad')) $gt = 3000000;
-                                                        else $gt = 7500000;
-                                                    }
-                                                    $sisaLunas = $gt - ($rsv->nominal_dp ?? 0);
-                                                @endphp
-                                                Rp {{ number_format($sisaLunas, 0, ',', '.') }}
-                                            @else
-                                                Rp {{ number_format($rsv->nominal_dp ?? 0, 0, ',', '.') }}
-                                            @endif
-                                    </cl>
+                                        Rp {{ number_format($nominalTampil, 0, ',', '.') }}
+                                    </td>
                                     <td class="px-6 py-4 text-center">
                                         @if($rsv->bukti_dp)
                                             <button 
@@ -154,7 +155,7 @@
                                                 data-paket="{{ $rsv->paket }}"
                                                 data-tanggal="{{ $rsv->tanggal }}"
                                                 data-sesi="{{ $rsv->sesi }}"
-                                                data-nominal="{{ number_format($rsv->nominal_dp ?? 0, 0, ',', '.') }}"
+                                                data-nominal="{{ number_format($nominalTampil, 0, ',', '.') }}"
                                                 data-bukti="{{ $rsv->bukti_dp }}"
                                                 data-status="{{ $rsv->status_dp }}"
                                                 onclick="lihatStruk(this)"
@@ -167,18 +168,36 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex justify-center gap-2">
-                                            <form action="{{ route('admin.keuangan.accDp', $rsv->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm flex items-center gap-1 transition">
-                                                    <i class="fa-solid fa-check"></i> ACC & Catat Kas
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('admin.keuangan.tolakDp', $rsv->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
-                                                    <i class="fa-solid fa-xmark"></i> Tolak
-                                                </button>
-                                            </form>
+                                            
+                                            @if($rsv->status === 'Menunggu Konfirmasi Tanggal')
+                                                <form action="{{ route('admin.keuangan.accTanggal', $rsv->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-purple-700 shadow-sm flex items-center gap-1 transition">
+                                                        <i class="fa-solid fa-calendar-check"></i> ACC Tgl
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('admin.keuangan.tolakTanggal', $rsv->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
+                                                        <i class="fa-solid fa-xmark"></i> Tolak Tgl
+                                                    </button>
+                                                </form>
+
+                                            @else
+                                                <form action="{{ route('admin.keuangan.accDp', $rsv->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm flex items-center gap-1 transition">
+                                                        <i class="fa-solid fa-check"></i> ACC DP & Kas
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('admin.keuangan.tolakDp', $rsv->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
+                                                        <i class="fa-solid fa-xmark"></i> Tolak DP
+                                                    </button>
+                                                </form>
+                                            @endif
+
                                         </div>
                                     </td>
                                 </tr>
@@ -241,7 +260,8 @@
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <button
-                                            onclick="lihatBuktiZis('{{ asset('storage/' . $zis->bukti_transfer) }}')"
+                                            type="button" 
+                                            onclick="lihatBuktiZis('{{ $zis->bukti_transfer }}')"
                                             class="bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">
                                             <i class="fa-solid fa-eye mr-1"></i> Lihat Bukti
                                         </button>
@@ -278,7 +298,6 @@
 
             </div>
 
-            {{-- Includes view memanggil blade lain yang ada di folder pencatatan --}}
             <div id="reserverView" class="view-section hidden w-full transition-all duration-300">
                 @include('admin.pencatatan.reserver')
             </div>
@@ -311,7 +330,7 @@
             </button>
             <div class="text-center mb-6">
                 <i class="fa-solid fa-receipt text-4xl text-green-600 mb-2"></i>
-                <h3 class="text-xl font-bold text-slate-800">Struk Pembayaran DP</h3>
+                <h3 id="struk_title" class="text-xl font-bold text-slate-800">Struk Pembayaran DP</h3>
                 <p class="text-xs text-slate-500">#RSV-<span id="struk_id"></span></p>
             </div>
             <div class="space-y-3 text-sm">
@@ -332,7 +351,7 @@
                     <span class="font-bold text-slate-800" id="struk_sesi"></span>
                 </div>
                 <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
-                    <span class="text-slate-500">Nominal DP</span>
+                    <span id="struk_label_nominal" class="text-slate-500">Nominal DP</span>
                     <span class="font-bold text-green-600 text-base" id="struk_nominal"></span>
                 </div>
                 <div class="flex justify-between border-b border-dashed border-slate-200 pb-2">
@@ -427,9 +446,9 @@
                                     <tr><td class="py-1.5 text-slate-500 w-1/3">Nama</td><td class="py-1.5 font-semibold text-slate-800" id="det_nama_pemohon">-</td></tr>
                                     <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_pemohon">-</td></tr>
                                     <tr><td class="py-1.5 text-slate-500 align-top">Alamat</td><td class="py-1.5 font-semibold text-slate-800" id="det_alamat_pemohon">-</td></tr>
+                                    <tr><td class="py-1.5 text-slate-500 align-top">Memo</td><td class="py-1.5 font-semibold text-slate-800" id="det_memo_pemohon">-</td></tr>
                                 </table>
                             </div>
-                            {{-- card Pengantin Pria --}}
                             <div id="card_cpp" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                                 <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-mars mr-2"></i>Pengantin Pria</h4>
                                 <table class="w-full text-sm">
@@ -437,8 +456,6 @@
                                     <tr><td class="py-1.5 text-slate-500">Telepon</td><td class="py-1.5 font-semibold text-slate-800" id="det_telp_cpp">-</td></tr>
                                 </table>
                             </div>
-
-                            {{-- card Pengantin Wanita --}}
                             <div id="card_cpw" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                                 <h4 class="font-bold text-sm text-pink-600 border-b border-slate-100 pb-2 mb-3"><i class="fa-solid fa-venus mr-2"></i>Pengantin Wanita</h4>
                                 <table class="w-full text-sm">
@@ -473,7 +490,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>{{-- tutup lg:w-2/3 --}}
+                    </div>
 
                     <div class="lg:w-1/3">
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm sticky top-0">
@@ -559,27 +576,41 @@
             statusEl.className = btn.dataset.status === 'lunas' ? 'font-bold text-green-600' : 
                                 btn.dataset.status === 'menunggu' ? 'font-bold text-orange-500' : 'font-bold text-red-500';
             
+            if (btn.dataset.status === 'dp_lunas_pending') {
+                document.getElementById('struk_title').textContent = 'Struk Pelunasan Reservasi';
+                document.getElementById('struk_label_nominal').textContent = 'Nominal Pelunasan';
+            } else {
+                document.getElementById('struk_title').textContent = 'Struk Pembayaran DP';
+                document.getElementById('struk_label_nominal').textContent = 'Nominal DP';
+            }
+
             document.getElementById('modalStruk').style.display = 'flex';
         }
 
         // Modal Bukti ZIS
-        function lihatBuktiZis(url) {
-            document.getElementById('imgBuktiZis').src = url;
-            document.getElementById('linkBuktiZis').href = url;
+        function lihatBuktiZis(path) {
+            if (!path || path.trim() === '') {
+                alert('Maaf, foto tidak ada atau sambungan ke database bermasalah.');
+                return; 
+            }
+        
+            let fullUrl = path.startsWith('/') ? path : '/' + path;
+        
+            document.getElementById('imgBuktiZis').src = fullUrl;
+            document.getElementById('linkBuktiZis').href = fullUrl;
+            
             const modal = document.getElementById('modalBuktiZis');
-            modal.style.display = 'flex'; // ✅ langsung set flex
+            modal.style.display = 'flex'; 
         }
 
         function tutupModalBuktiZis() {
-            document.getElementById('modalBuktiZis').style.display = 'none'; // ✅ langsung none
-            document.getElementById('imgBuktiZis').src = ''; // bersihkan src
+            document.getElementById('modalBuktiZis').style.display = 'none';
+            document.getElementById('imgBuktiZis').src = ''; 
         }
 
-        // Modal Detail Reserver
         function bukaModalReserver(btn) {
         const data = JSON.parse(btn.getAttribute('data-rsv'));
         
-        // Hitung total terbayar dari transaksi pemasukan
         let totalTerbayar = 0;
         let htmlTransaksi = '';
 
@@ -607,7 +638,6 @@
             htmlTransaksi = '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada riwayat tercatat.</p>';
         }
 
-        /// grand_total dari DB; jika 0 fallback otomatis berdasarkan paket
         let grandTotal = parseFloat(data.grand_total || 0);
         if (grandTotal === 0) {
             const pkt = (data.paket || '').toLowerCase();
@@ -617,10 +647,8 @@
             else                                    grandTotal = 7500000;
         }
 
-        // Sisa tagihan = grand_total - total terbayar
         let sisaTagihan = Math.max(0, grandTotal - totalTerbayar);
 
-        // Status pembayaran
         let statusBayarText = 'BELUM BAYAR';
         let statusBayarColor = 'text-red-500';
         if (grandTotal > 0 && totalTerbayar >= grandTotal) {
@@ -631,7 +659,6 @@
             statusBayarColor = 'text-orange-500';
         }
 
-        // Isi data umum
         document.getElementById('det_status').textContent = data.status || '-';
         let elStatusDp = document.getElementById('det_status_dp');
         elStatusDp.textContent = statusBayarText;
@@ -646,8 +673,8 @@
         document.getElementById('det_nama_pemohon').textContent = data.nama_pemohon || '-';
         document.getElementById('det_telp_pemohon').textContent = data.telp_pemohon || '-';
         document.getElementById('det_alamat_pemohon').textContent = data.alamat_pemohon || '-';
+        document.getElementById('det_memo_pemohon').textContent = data.memo_pemohon || '-';
 
-        // Sembunyikan/tampilkan card Pengantin berdasarkan jenis paket
         const paketLower = (data.paket || '').toLowerCase();
         const isPernikahan = paketLower.includes('wedding') || paketLower.includes('akad');
         
@@ -662,10 +689,10 @@
             document.getElementById('det_telp_cpw').textContent = data.telp_cpw || '-';
         }
 
-        // Dokumen
         const renderDocBtn = (path) => {
             if (!path) return `<span class="text-[10px] text-red-400 font-bold bg-red-50 px-2 py-1 rounded">Belum Upload</span>`;
-            return `<a href="/storage/${path}" target="_blank" class="text-[10px] font-bold bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-md transition shadow-sm"><i class="fa-solid fa-eye mr-1"></i>Lihat Dokumen</a>`;
+            
+            return `<a href="/${path}" target="_blank" class="text-[10px] font-bold bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-md transition shadow-sm"><i class="fa-solid fa-eye mr-1"></i>Lihat Dokumen</a>`;
         };
         document.getElementById('doc_kua').innerHTML = renderDocBtn(data.surat_rekomendasi);
         document.getElementById('doc_ktp_cpp').innerHTML = renderDocBtn(data.foto_ktp_cpp);
@@ -673,7 +700,6 @@
         document.getElementById('doc_foto_cpp').innerHTML = renderDocBtn(data.foto_cpp_3x4);
         document.getElementById('doc_foto_cpw').innerHTML = renderDocBtn(data.foto_cpw_3x4);
 
-        // Buka modal dengan animasi
         const modal = document.getElementById('modalDetailReserver');
         const content = document.getElementById('modalDetailContent');
         modal.classList.remove('hidden');

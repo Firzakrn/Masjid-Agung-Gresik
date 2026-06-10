@@ -34,8 +34,7 @@
     </div>
 
     <div class="w-full flex flex-col">
-
-        {{-- PAKET WORKSHOP --}}
+    <!-- PAKET WORKSHOP -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/work.jpg') }}', '{{ asset('images/reservasi/work2.jpg') }}', '{{ asset('images/reservasi/work3.jpg') }}'],
@@ -84,7 +83,7 @@
             </div>
         </section>
 
-        {{-- PAKET WISUDA --}}
+        <!-- PAKET WISUDA -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/wisuda.jpg') }}', '{{ asset('images/reservasi/wisuda2.jpg') }}', '{{ asset('images/reservasi/wisuda3.jpg') }}'],
@@ -132,7 +131,7 @@
             </div>
         </section>
 
-        {{-- PAKET MAJELIS TAKLIM --}}
+        <!-- PAKET MAJELIS TAKLIM -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/majlis.jpg') }}', '{{ asset('images/reservasi/majlis1.png') }}', '{{ asset('images/reservasi/majlis2.jpg') }}'],

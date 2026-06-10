@@ -16,7 +16,6 @@ class Reservasi extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Tambah ini saja
     public function transaksis()
     {
         return $this->hasMany(Transaksi::class);

@@ -18,8 +18,6 @@
         $harga_paket = 0; 
         $isAula = false;
         $bgImage = 'majlis.jpg';
-        
-        // PENANDA BARU UNTUK SOCIAL EVENT
         $isSocialEvent = false; 
 
         if (stripos($paket, 'Intimate Wedding') !== false) {
@@ -41,19 +39,19 @@
             $dp = 2000000;
             $isAula = true; 
             $bgImage = 'work.jpg'; 
-            $isSocialEvent = true; // Tandai sebagai Social Event
+            $isSocialEvent = true; 
         } elseif (stripos($paket, 'Wisuda') !== false) {
             $harga_paket = 7500000;
             $dp = 2000000;
             $isAula = true;
             $bgImage = 'wisuda.jpg'; 
-            $isSocialEvent = true; // Tandai sebagai Social Event
+            $isSocialEvent = true; 
         } elseif (stripos($paket, 'Majelis') !== false) {
             $harga_paket = 7500000;
             $dp = 2000000;
             $isAula = true;
             $bgImage = 'majlis.jpg'; 
-            $isSocialEvent = true; // Tandai sebagai Social Event
+            $isSocialEvent = true; 
         } 
     @endphp
 
@@ -113,6 +111,7 @@
                 
                 <form action="{{ route('reservasi.submit') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="reservasi_id" value="{{ request('id') }}">
                     <input type="hidden" name="paket" value="{{ $paket }}">
                     <input type="hidden" name="tanggal" value="{{ $tanggal }}">
                     <input type="hidden" name="sesi" value="{{ $sesi }}">
@@ -122,19 +121,19 @@
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                 <label class="text-sm font-semibold text-slate-700">Nama Pemohon <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama_pemohon" required placeholder="Nama Pemohon" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="text" name="nama_pemohon" value="{{ $reservasi->nama_pemohon ?? '' }}" required placeholder="Nama Pemohon" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                 <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                <input type="text" name="alamat_pemohon" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="text" name="alamat_pemohon" value="{{ $reservasi->alamat_pemohon ?? '' }}" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                 <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                <input type="tel" name="telp_pemohon" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="tel" name="telp_pemohon" value="{{ $reservasi-> telp_pemohon ?? '' }}" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start pt-2">
                                 <label class="text-sm font-semibold text-slate-700 mt-2">Memo / Catatan Tambahan</label>
-                                <textarea name="memo_pemohon" placeholder="Tuliskan catatan khusus atau permintaan tambahan di sini..." class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="3"></textarea>
+                                <textarea name="memo_pemohon" placeholder="Tuliskan catatan khusus atau permintaan tambahan di sini..." class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="3">{{ $reservasi->memo_pemohon ?? '' }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -149,20 +148,20 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Nama (CPP) <span class="text-red-500">*</span></label>
                                     <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                                        <input type="text" name="nama_cpp" required placeholder="Nama (CPP)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        <input type="text" name="nama_cpp" value="{{ $reservasi->nama_cpp ?? '' }}" required placeholder="Nama (CPP)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
                                         <div class="flex items-center gap-2">
                                             <span class="text-sm font-semibold">Bin <span class="text-red-500">*</span></span>
-                                            <input type="text" name="bin_cpp" required placeholder="Bin" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                            <input type="text" name="bin_cpp" value="{{ $reservasi->bin_cpp ?? '' }}" required placeholder="Bin" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                    <input type="text" name="alamat_cpp" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="text" name="alamat_cpp" value="{{ $reservasi->alamat_cpp ?? '' }}" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="telp_cpp" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="tel" name="telp_cpp" value="{{ $reservasi->telp_cpp ?? '' }}" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                             </div>
 
@@ -171,20 +170,20 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Nama (CPW) <span class="text-red-500">*</span></label>
                                     <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                                        <input type="text" name="nama_cpw" required placeholder="Nama (CPW)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                        <input type="text" name="nama_cpw" value="{{ $reservasi->nama_cpw ?? '' }}" required placeholder="Nama (CPW)" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
                                         <div class="flex items-center gap-2">
                                             <span class="text-sm font-semibold">Binti <span class="text-red-500">*</span></span>
-                                            <input type="text" name="binti_cpw" required placeholder="Binti" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                            <input type="text" name="binti_cpw" value="{{ $reservasi->binti_cpw ?? '' }}" required placeholder="Binti" class="w-full p-3 border border-slate-300 rounded-lg outline-none">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                    <input type="text" name="alamat_cpw" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="text" name="alamat_cpw" value="{{ $reservasi->alamat_cpw ?? '' }}" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="telp_cpw" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="tel" name="telp_cpw" value="{{ $reservasi->telp_cpw ?? '' }}" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                             </div>
                         </div>
@@ -194,19 +193,19 @@
                             <div class="space-y-4">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Nama Wali (CPW) <span class="text-red-500">*</span></label>
-                                    <input type="text" name="nama_wali" required placeholder="Nama Wali (CPW)" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="text" name="nama_wali" value="{{ $reservasi->nama_wali ?? '' }}" required placeholder="Nama Wali (CPW)" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Alamat <span class="text-red-500">*</span></label>
-                                    <input type="text" name="alamat_wali" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="text" name="alamat_wali" value="{{ $reservasi->alamat_wali ?? '' }}" required placeholder="Alamat" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Telp / HP <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="telp_wali" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="tel" name="telp_wali" value="{{ $reservasi->telp_wali ?? '' }}" required placeholder="Telp / HP" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-6">
                                     <label class="text-sm font-semibold text-slate-700">KUA dari Kecamatan <span class="text-red-500">*</span></label>
-                                    <input type="text" name="kua_kecamatan" required placeholder="KUA dari Kecamatan" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
+                                    <input type="text" name="kua_kecamatan" value="{{ $reservasi->kua_kecamatan ?? '' }}" required placeholder="KUA dari Kecamatan" class="md:col-span-2 w-full p-3 border border-slate-300 rounded-lg outline-none">
                                 </div>
                             </div>
                         </div>
@@ -232,7 +231,7 @@
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <label class="text-sm font-semibold text-slate-700">Foto Wanita (CPW) 3x4</label>
-                                    <input type="file" name="foto_cpw_3x4" accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+                                    <input type="file" name="foto_cpw_3x4"  accept="image/*" class="md:col-span-2 w-full p-2 border border-slate-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                                 </div>
                             </div>
                         </div>
@@ -273,7 +272,6 @@
                     <div class="space-y-6">
                         <div>
                             <span class="text-slate-800 font-semibold block mb-1">Biaya :</span>
-                            {{-- Memastikan pakai variabel yang benar dari Controller/Blade sebelumnya --}}
                             <div class="text-2xl text-slate-900">Rp {{ number_format($harga_paket ?? $harga, 0, ',', '.') }}</div>
                         </div>
                         <div>

@@ -12,42 +12,69 @@ use Carbon\Carbon;
 class KeuanganController extends Controller
 {
     public function index()
-{
-    $antreanDp = Reservasi::whereNotIn('status_dp', ['disetujui', 'ditolak', 'lunas'])
-        ->with('user')
+    {
+        $antreanDp = Reservasi::whereNotIn('status_dp', ['disetujui', 'ditolak', 'lunas'])
+        ->whereNotIn('status', [
+            'Tanggal Dikonfirmasi - Silakan Lanjut Isi Formulir',
+            'Menunggu Pembayaran DP'
+        ])
+        ->with('user') 
         ->latest()
         ->get();
+    
+        $riwayat = Transaksi::with(['kategori', 'reservasi'])
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+    
+        $kategoriPemasukan   = KategoriKeuangan::where('jenis', 'pemasukan')->get();
+        $kategoriPengeluaran = KategoriKeuangan::where('jenis', 'pengeluaran')->get();
+        $jumlahPendingDp     = $antreanDp->count();
+    
+        $semuaReservasi = Reservasi::with(['user', 'transaksis'])->latest()->get();
+        $antreanZis = Zis::where('status', 'pending')->latest()->get();
+    
+        return view('admin.pencatatan.index', compact(
+            'antreanDp', 'antreanZis', 'riwayat', 'kategoriPemasukan',
+            'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'
+        ));
+    }
 
-    $riwayat = Transaksi::with(['kategori', 'reservasi'])
-        ->orderBy('tanggal', 'desc')
-        ->orderBy('id', 'desc')
-        ->get();
+    // --------------------------------------------------------
+    // Konfirmasi & Penolakan Ketersediaan Tanggal Reservasi
+    // --------------------------------------------------------
+    public function accTanggal($id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+        
+        $reservasi->update([
+            'status' => 'Tanggal Dikonfirmasi - Silakan Lanjut Isi Formulir'
+        ]);
 
-    $kategoriPemasukan   = KategoriKeuangan::where('jenis', 'pemasukan')->get();
-    $kategoriPengeluaran = KategoriKeuangan::where('jenis', 'pengeluaran')->get();
-    $jumlahPendingDp     = $antreanDp->count();
+        return back()->with('success', 'Tanggal berhasil dikonfirmasi available!');
+    }
 
-    $semuaReservasi = Reservasi::with(['user', 'transaksis'])->latest()->get();
-    $antreanZis = Zis::where('status', 'pending')->latest()->get();
+    public function tolakTanggal($id)
+    {
+        $reservasi = Reservasi::findOrFail($id);
+        
+        $reservasi->update([
+            'status' => 'Tanggal Ditolak', 
+        ]);
 
-    return view('admin.pencatatan.index', compact(
-        'antreanDp', 'antreanZis', 'riwayat', 'kategoriPemasukan',
-        'kategoriPengeluaran', 'jumlahPendingDp', 'semuaReservasi'
-    ));
-}
-
+        return back()->with('success', 'Tanggal ditolak. Jadwal di kalender kembali kosong.');
+    }
+    
     public function accDp($id)
     {
         $rsv = Reservasi::findOrFail($id);
         $paketLokal = strtolower($rsv->paket);
 
-        // Bedakan jenis transaksi
         $isLunas = $rsv->status_dp === 'dp_lunas_pending';
 
         if ($isLunas) {
         $namaKategori = 'Pelunasan Reservasi';
         
-        // Fallback grand_total jika 0
         $grandTotal = $rsv->grand_total;
         if (!$grandTotal || $grandTotal == 0) {
             $pkt = strtolower($rsv->paket);
@@ -58,15 +85,17 @@ class KeuanganController extends Controller
         }
         
         $nominal = $grandTotal - $rsv->nominal_dp;
-        // ...
-        } else {
-            $namaKategori = 'DP Social Event'; // default
-            if (str_contains($paketLokal, 'wedding')) $namaKategori = 'DP Wedding';
-            elseif (str_contains($paketLokal, 'akad')) $namaKategori = 'DP Akad';
-            $nominal = $rsv->nominal_dp;
+        $rsv->update([
+        'status_dp' => 'lunas',
+        'status'    => 'Lunas',
+     ]); 
+        }  else {
+            $namaKategori = 'DP Reservasi';
+            $nominal      = $rsv->nominal_dp;
+
             $rsv->update([
                 'status_dp' => 'disetujui',
-                'status'    => 'Sudah DP',
+                'status'    => 'DP Disetujui',
             ]);
         }
 
@@ -101,7 +130,6 @@ class KeuanganController extends Controller
     }
 
     // === FUNGSI LAPORAN ===
-    // Mengelompokkan total transaksi per kategori agar grafik/tabel lebih rapi
     public function laporan(Request $request)
     {
         $bulan = $request->bulan;
@@ -162,13 +190,23 @@ class KeuanganController extends Controller
     // === FUNGSI TAMBAH TRANSAKSI MANUAL ===
     public function tambah(Request $request)
     {
-        // 1. Proses Upload Bukti Bayar
+        $request->validate([
+            'tanggal' => 'required|date',
+            'jenis'   => 'required|in:pemasukan,pengeluaran',
+            'nominal' => 'required|numeric|min:1', 
+        ], [
+            'nominal.required' => 'Nominal uang tidak boleh kosong!',
+            'nominal.numeric'  => 'Nominal harus berupa angka.'
+        ]);
+        
         $buktiBayar = null;
         if ($request->hasFile('bukti_bayar')) {
-            $buktiBayar = $request->file('bukti_bayar')->store('bukti_transaksi', 'public');
+            $file = $request->file('bukti_bayar');
+            $nama_file = time() . '_' . $file->hashName();
+            $file->move($_SERVER['DOCUMENT_ROOT'] . '/bukti_transaksi', $nama_file);
+            $buktiBayar = 'bukti_transaksi/' . $nama_file;
         }
 
-        // 2. Susun keterangan otomatis berdasarkan jenis transaksi
         if ($request->jenis === 'pengeluaran') {
             $keterangan = '';
             if ($request->pihak_penerima)         $keterangan .= 'Penerima: ' . $request->pihak_penerima;
@@ -180,7 +218,6 @@ class KeuanganController extends Controller
             if ($request->uang)          $keterangan .= ($keterangan ? ' | ' : '') . 'Via: ' . $request->uang;
         }
 
-        // 3. Simpan transaksi
         Transaksi::create([
             'tanggal'      => $request->tanggal,
             'jenis'        => $request->jenis,
@@ -194,12 +231,10 @@ class KeuanganController extends Controller
 
         $pesanTambahan = '';
 
-        // 4. Cek status pelunasan jika terikat dengan reservasi
         if ($request->filled('reservasi_id')) {
             $rsv = Reservasi::with('transaksis')->find($request->reservasi_id);
 
             if ($rsv) {
-                // Hitung semua transaksi pemasukan yang terikat dengan ID reservasi ini
                 $totalDibayar = $rsv->transaksis->where('jenis', 'pemasukan')->sum('nominal');
                 $grandTotal   = $rsv->grand_total;
 
@@ -253,7 +288,6 @@ class KeuanganController extends Controller
         return response()->json(['success' => true]);
     }
     
-// Simpan ke antrian, tunggu ACC admin
     public function storeZis(Request $request)
         {
             $request->validate([
@@ -265,7 +299,13 @@ class KeuanganController extends Controller
                 'bukti_transfer' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             ]);
 
-            $bukti = $request->file('bukti_transfer')->store('bukti_zis', 'public');
+            $bukti = null;
+            if ($request->hasFile('bukti_transfer')) {
+                $file = $request->file('bukti_transfer');
+                $nama_file = time() . '_' . $file->hashName();
+                $file->move($_SERVER['DOCUMENT_ROOT'] . '/bukti_zis', $nama_file);
+                $bukti = 'bukti_zis/' . $nama_file;
+            }
 
             Zis::create([
                 'user_id'        => auth()->id(),
@@ -281,66 +321,64 @@ class KeuanganController extends Controller
             return back()->with('success', 'Jazakallah khairan! Pembayaran ZIS Anda sedang menunggu verifikasi admin.');
         }
 
-// Admin ACC → masuk kas
-public function accZis($id)
-{
-    $zis = Zis::findOrFail($id);
+    public function accZis($id)
+    {
+        $zis = Zis::findOrFail($id);
 
-    $jenisDana  = $zis->jenis_dana;
-    $jenisDanaLower = strtolower($jenisDana);
+        $jenisDana  = $zis->jenis_dana;
+        $jenisDanaLower = strtolower($jenisDana);
 
-    $keterangan = $jenisDana
-                . ' | ' . $zis->jumlah_orang . ' orang'
-                . ' | Atas nama: ' . $zis->nama_pemberi;
-    if ($zis->keterangan) {
-        $keterangan .= ' | ' . $zis->keterangan;
+        $keterangan = $jenisDana
+                    . ' | ' . $zis->jumlah_orang . ' orang'
+                    . ' | Atas nama: ' . $zis->nama_pemberi;
+        if ($zis->keterangan) {
+            $keterangan .= ' | ' . $zis->keterangan;
+        }
+
+        if (str_contains($jenisDanaLower, 'fitrah')) {
+            $namaKategori = 'Zakat Fitrah Online';
+        } elseif (str_contains($jenisDanaLower, 'maal')) {
+            $namaKategori = 'Zakat Maal Online';
+        } elseif (str_contains($jenisDanaLower, 'fakir')) {
+            $namaKategori = 'Infaq Fakir Miskin Online';
+        } elseif (str_contains($jenisDanaLower, 'masjid')) {
+            $namaKategori = 'Infaq Masjid Online';
+        } elseif (str_contains($jenisDanaLower, 'yatim')) {
+            $namaKategori = 'Infaq Anak Yatim Online';
+        } elseif (str_contains($jenisDanaLower, 'infaq')) {
+            $namaKategori = 'Infaq Online'; 
+        } elseif (str_contains($jenisDanaLower, 'sedekah')) {
+            $namaKategori = 'Sedekah Online';
+        } else {
+            $namaKategori = 'ZIS Online'; 
+        }
+
+        $kategori = KategoriKeuangan::firstOrCreate(
+            ['nama' => $namaKategori],
+            ['jenis' => 'pemasukan']
+        );
+
+        Transaksi::create([
+            'tanggal'     => now(),
+            'jenis'       => 'pemasukan',
+            'kategori_id' => $kategori->id,
+            'nominal'     => $zis->jumlah_dana,
+            'keterangan'  => $keterangan,
+            'sumber'      => 'zis_online',
+            'bukti_bayar' => $zis->bukti_transfer,
+        ]);
+
+        $zis->update(['status' => 'disetujui']);
+
+        return back()->with('success', 'ZIS atas nama ' . $zis->nama_pemberi . ' berhasil disetujui dan masuk ke kas kategori: ' . $namaKategori);
     }
 
-    // Auto kategori — urutan dari paling spesifik ke umum
-    if (str_contains($jenisDanaLower, 'fitrah')) {
-        $namaKategori = 'Zakat Fitrah Online';
-    } elseif (str_contains($jenisDanaLower, 'maal')) {
-        $namaKategori = 'Zakat Maal Online';
-    } elseif (str_contains($jenisDanaLower, 'fakir')) {
-        $namaKategori = 'Infaq Fakir Miskin Online';
-    } elseif (str_contains($jenisDanaLower, 'masjid')) {
-        $namaKategori = 'Infaq Masjid Online';
-    } elseif (str_contains($jenisDanaLower, 'yatim')) {
-        $namaKategori = 'Infaq Anak Yatim Online';
-    } elseif (str_contains($jenisDanaLower, 'infaq')) {
-        $namaKategori = 'Infaq Online'; // fallback
-    } elseif (str_contains($jenisDanaLower, 'sedekah')) {
-        $namaKategori = 'Sedekah Online';
-    } else {
-        $namaKategori = 'ZIS Online'; // fallback paling umum
+    // Admin tolak
+    public function tolakZis($id)
+    {
+        $zis = Zis::findOrFail($id);
+        $zis->update(['status' => 'ditolak']);
+
+        return back()->with('success', 'ZIS atas nama ' . $zis->nama_pemberi . ' telah ditolak.');
     }
-
-    $kategori = KategoriKeuangan::firstOrCreate(
-        ['nama' => $namaKategori],
-        ['jenis' => 'pemasukan']
-    );
-
-    Transaksi::create([
-        'tanggal'     => now(),
-        'jenis'       => 'pemasukan',
-        'kategori_id' => $kategori->id,
-        'nominal'     => $zis->jumlah_dana,
-        'keterangan'  => $keterangan,
-        'sumber'      => 'zis_online',
-        'bukti_bayar' => $zis->bukti_transfer,
-    ]);
-
-    $zis->update(['status' => 'disetujui']);
-
-    return back()->with('success', 'ZIS atas nama ' . $zis->nama_pemberi . ' berhasil disetujui dan masuk ke kas kategori: ' . $namaKategori);
-}
-
-// Admin tolak
-public function tolakZis($id)
-{
-    $zis = Zis::findOrFail($id);
-    $zis->update(['status' => 'ditolak']);
-
-    return back()->with('success', 'ZIS atas nama ' . $zis->nama_pemberi . ' telah ditolak.');
-}
 }

@@ -60,7 +60,6 @@
                     <form action="{{ route('zis.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        {{-- Nama Lengkap --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Nama Lengkap <span class="text-red-500">*</span>
@@ -78,7 +77,6 @@
                             </div>
                         </div>
 
-                        {{-- Jenis Dana --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Jenis Dana / Penyaluran <span class="text-red-500">*</span>
@@ -98,7 +96,6 @@
                             </div>
                         </div>
 
-                        {{-- Nominal --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Nominal (Rp) <span class="text-red-500">*</span>
@@ -132,7 +129,6 @@
                             <p class="text-xs text-slate-400 mt-2">*Nominal Zakat Fitra 1 orang sebesar Rp 50.000,-</p>
                         </div>
 
-                        {{-- Jumlah Orang yang Dizakati --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Jumlah Orang yang Dizakati
@@ -157,7 +153,6 @@
                             <p class="text-xs text-slate-400 mt-2">Jumlah jiwa yang ingin Anda zakatkan (termasuk diri sendiri)</p>
                         </div>
 
-                        {{-- Keterangan --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Keterangan
@@ -168,7 +163,6 @@
                                       class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none transition resize-none"></textarea>
                         </div>
 
-                        {{-- Upload Bukti Transfer --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 Bukti Transfer <span class="text-red-500">*</span>
@@ -184,7 +178,6 @@
                                    accept="image/*,.pdf" required class="hidden"
                                    onchange="previewFile(event)">
 
-                            {{-- Preview File --}}
                             <div id="preview-area" class="hidden mt-3 flex items-center gap-3 border border-slate-200 rounded-xl p-3 bg-white">
                                 <img id="preview-img" src="" alt="preview" class="w-12 h-12 object-cover rounded-lg hidden">
                                 <i id="preview-icon" class="fa-solid fa-file-pdf text-3xl text-red-400 hidden"></i>
@@ -199,7 +192,6 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Submit --}}
                         <button type="submit"
                                 class="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center justify-center gap-2">
                             Kirim Pembayaran <i class="fa-solid fa-paper-plane"></i>
@@ -208,10 +200,9 @@
                     </form>
                 </div>
 
-                {{-- KOLOM KANAN --}}
+                {{-- KOLOM KANAN: PEMBAYARAN --}}
                 <div class="lg:col-span-5 space-y-6">
 
-                    {{-- Card QRIS & Rekening --}}
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 text-center">
                         <div class="inline-block bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
                             <i class="fa-solid fa-qrcode mr-1"></i> Scan QRIS
@@ -228,7 +219,6 @@
                         </div>
                     </div>
 
-                    {{-- Card Cara Berinfaq --}}
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                         <h3 class="text-base font-bold text-green-800 mb-5 flex items-center gap-2 border-b border-slate-100 pb-3">
                             <i class="fa-solid fa-circle-info text-green-500"></i> Cara Berinfaq via QRIS
@@ -266,7 +256,6 @@
                     </div>
 
                 </div>
-                {{-- END KOLOM KANAN --}}
 
             </div>
         </div>

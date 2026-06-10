@@ -11,7 +11,6 @@
     
     <style>
         :root {
-            /* Variabel warna biru edukasi */
             --biru-edu: #0284c7; 
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -37,7 +36,7 @@
     
     @include('navbar')
 
-    <!-- HERO SECTION KHUSUS PENDIDIKAN -->
+    <!-- HIGHLIGHT PENDIDIKAN -->
     <div class="w-full bg-gradient-to-br from-[#0284c7] to-blue-400 py-16 md:py-24 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-900 opacity-20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
@@ -63,25 +62,21 @@
             <div class="swiper pendidikanSwiper w-full !pb-12">
                 <div class="swiper-wrapper">
                     
-                    <!-- DILAKUKAN PERULANGAN UNTUK SELURUH KARTU -->
                     @forelse($pendidikanPosters as $item)
                         <div class="swiper-slide h-auto">
                             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group hover:shadow-xl transition-all duration-300">
                                 
-                                <!-- Image wrapper -->
                                 <div class="relative h-56 overflow-hidden bg-slate-200">
                                     <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1629273229214-d96be4552b9a?q=80&w=1170&auto=format&fit=crop' }}" 
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                                          alt="{{ $item->judul }}">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     
-                                    <!-- Badge Status (Bisa diatur dinamis nanti) -->
                                     <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-center rounded-xl px-3 py-1.5 shadow-lg border border-white/50">
                                         <span class="text-xs font-extrabold text-green-600 uppercase tracking-wide"><i class="fa-solid fa-door-open mr-1"></i> Program Aktif</span>
                                     </div>
                                 </div>
                                 
-                                <!-- Content -->
                                 <div class="p-6 flex flex-col flex-grow">
                                     <div class="flex items-center gap-2 text-xs font-bold text-[#0284c7] bg-blue-50 px-3 py-1.5 rounded-lg w-max mb-4">
                                         <i class="fa-solid fa-user-graduate"></i> Terbuka Umum
@@ -91,7 +86,6 @@
                                         {{ $item->judul }}
                                     </h3>
                                     
-                                    <!-- Jika tabel berita punya kolom isi/konten, panggil di sini. Jika tidak, gunakan teks pendukung ini -->
                                     <p class="text-slate-600 text-sm line-clamp-3 mb-6">
                                         Bergabunglah dengan program {{ $item->judul }} di Masjid Agung Gresik untuk pendalaman ilmu dan pembinaan generasi Islami.
                                     </p>
@@ -106,7 +100,6 @@
                             </div>
                         </div>
                     @empty
-                        <!-- Tampilan Jika Database Masih Kosong -->
                         <div class="w-full p-8 text-center bg-white rounded-3xl border border-slate-200 shadow-sm col-span-full">
                             <i class="fa-solid fa-folder-open text-5xl text-slate-300 mb-4"></i>
                             <p class="text-slate-500 font-medium">Belum ada program pendidikan yang dipublikasikan saat ini.</p>

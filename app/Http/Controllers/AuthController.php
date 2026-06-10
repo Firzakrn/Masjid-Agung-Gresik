@@ -79,36 +79,30 @@ class AuthController extends Controller
     // === FUNGSI LOGIN ===
     public function login(Request $request)
     {
-        // 1. Cek dari portal mana request ini dikirim
         $emailName    = $request->has('ADMIN_EMAIL')    ? 'ADMIN_EMAIL'    : 'USER_EMAIL';
         $passwordName = $request->has('ADMIN_PASSWORD') ? 'ADMIN_PASSWORD' : 'USER_PASSWORD';
 
-        // 2. Validasi input
         $request->validate([
             $emailName    => 'required|email',
             $passwordName => 'required',
         ]);
 
-        // 3. Ambil data mentahnya
         $email    = $request->$emailName;
         $password = $request->$passwordName;
 
         $user = User::where('email', $email)->first();
 
-        // 4. Cegah user Google login manual tanpa password
         if ($user && (is_null($user->password) || $user->password === '')) {
             return back()->withErrors([
                 $emailName => 'Akun ini terdaftar via Google. Silakan gunakan tombol "Login dengan Google", atau klik "Lupa password?" untuk membuat password baru.',
             ])->onlyInput($emailName);
         }
 
-        // 5. Setup kredensial
         $credentials = [
             'email'    => $email,
             'password' => $password,
         ];
 
-        // 6. Eksekusi Login & Pengecekan Kamar Portal
         if (Auth::attempt($credentials)) {
             $user            = Auth::user();
             $loginLewatAdmin = $request->is('admin*');
@@ -129,11 +123,9 @@ class AuthController extends Controller
                 return redirect('/admin/dashboard');
             }
 
-            // Cukup gunakan intended() dengan fallback '/'
             return redirect()->intended('/')->with('welcome', "Selamat datang, {$user->name}!");
         }
 
-        // 7. Jika email/password salah
         return back()->withErrors([
             $emailName => 'Email atau password yang Anda masukkan tidak sesuai.',
         ])->onlyInput($emailName);

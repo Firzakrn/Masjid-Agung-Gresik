@@ -37,7 +37,7 @@
 
     <div class="w-full flex flex-col">
 
-        {{-- PAKET WEDDING HALL --}}
+        <!-- PAKET WEDDING HALL -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/wedhall.jpg') }}', '{{ asset('images/reservasi/wedhall2.jpg') }}', '{{ asset('images/reservasi/wedhall3.jpg') }}'],
@@ -86,7 +86,7 @@
             </div>
         </section>
 
-        {{-- PAKET INTIMATE WEDDING --}}
+        <!-- PAKET INTIMATE WEDDING -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/wedint.jpg') }}', '{{ asset('images/reservasi/wedint2.jpg') }}', '{{ asset('images/reservasi/wedint3.jpg') }}'],
@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        {{-- PAKET AKAD NIKAH --}}
+        <!-- PAKET AKAD NIKAH -->
         <section x-data="{ 
             active: 0, 
             images: ['{{ asset('images/reservasi/akad.jpg') }}', '{{ asset('images/reservasi/akad2.jpg') }}', '{{ asset('images/reservasi/akad3.jpg') }}'],

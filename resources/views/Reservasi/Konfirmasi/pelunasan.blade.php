@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    {{-- Snap.js Midtrans --}}
     @if(config('midtrans.is_production'))
         <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     @else
@@ -25,7 +24,7 @@
 
     <div class="max-w-6xl mx-auto px-4 py-12">
 
-        {{-- PROGRESS BAR --}}
+        <!-- PROGRESS BAR -->
         <div class="flex items-center justify-center gap-2 md:gap-6 mb-12 overflow-x-auto pb-4">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center"><i class="fa-solid fa-check text-sm"></i></div>
@@ -48,13 +47,11 @@
             </div>
         </div>
 
-        {{-- KONTEN UTAMA --}}
+        <!-- PEMBAYARAN -->
         <div x-data="pelunasanForm()" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {{-- KOLOM KIRI --}}
             <div class="lg:col-span-8 space-y-8">
 
-                {{-- INFO RINGKASAN PEMBAYARAN --}}
                 <div class="bg-green-50 border border-green-200 rounded-[2rem] p-6 md:p-8 flex gap-5 items-start">
                     <div class="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-md">
                         <i class="fa-solid fa-circle-check"></i>
@@ -65,10 +62,9 @@
                     </div>
                 </div>
 
-                {{-- BLOK TOMBOL BAYAR --}}
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10">
 
-                    {{-- OPSI 1: MIDTRANS OTOMATIS --}}
+                    <!-- OPSI 1: MIDTRANS OTOMATIS -->
                     <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 1: Pelunasan Otomatis</h2>
                     <p class="text-sm text-slate-500 mb-6">Diproses seketika via Midtrans (Transfer Bank, E-Wallet, Kartu Kredit).</p>
 
@@ -79,7 +75,6 @@
                         <span class="px-3 py-1 bg-blue-100 rounded-lg text-xs font-semibold text-blue-700">ShopeePay</span>
                     </div>
 
-                    {{-- Alert error --}}
                     <div x-show="errorMsg" x-cloak class="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm" x-text="errorMsg"></div>
 
                     <div class="flex justify-between items-center mb-8">
@@ -101,7 +96,7 @@
                         </button>
                     </div>
 
-                    {{-- OPSI 2: QRIS / TRANSFER MANUAL --}}
+                    <!-- OPSI 2: QRIS / TRANSFER MANUAL -->
                     <div class="pt-8 border-t border-slate-200">
                         <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 2: Transfer Manual / QRIS Masjid</h2>
                         <p class="text-sm text-slate-500 mb-6">Jika opsi otomatis bermasalah, silakan transfer ke rekening masjid atau scan QRIS di bawah ini.</p>
@@ -150,7 +145,7 @@
                 </div>
             </div>
 
-            {{-- KOLOM KANAN: STRUK --}}
+            <!-- STRUK -->
             <div class="lg:col-span-4">
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 sticky top-10 relative overflow-hidden">
                     <h3 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Ringkasan Pelunasan</h3>

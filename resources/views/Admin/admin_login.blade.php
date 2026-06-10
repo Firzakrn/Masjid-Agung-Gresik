@@ -30,7 +30,6 @@
 
     <div class="bg-white rounded-[20px] shadow-2xl flex flex-col md:flex-row max-w-3xl w-full overflow-hidden min-h-[500px]">
 
-        {{-- Panel kiri --}}
         <div class="w-full md:w-5/12 bg-green-700 text-white flex flex-col items-center justify-center p-8 text-center relative">
             <div class="absolute inset-0 bg-black/20"></div>
             <div class="relative z-10 flex flex-col items-center">
@@ -40,7 +39,6 @@
             </div>
         </div>
 
-        {{-- Panel kanan --}}
         <div class="w-full md:w-7/12 p-8 md:p-12 flex items-center justify-center bg-white">
             <form action="{{ route('admin.login.submit') }}" method="POST"
                   class="w-full flex flex-col items-center"
@@ -50,7 +48,6 @@
                 <h1 class="text-3xl font-bold mb-2 text-gray-800">Selamat Datang</h1>
                 <p class="text-sm text-gray-500 mb-6 text-center">Silakan masuk untuk mengelola data masjid.</p>
 
-                {{-- ✅ Notifikasi error dari session (misal: "These credentials do not match") --}}
                 @if (session('error'))
                     <div class="slide-down w-full mb-5 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-start gap-3"
                          id="sessionError">
@@ -69,7 +66,6 @@
                     </div>
                 @endif
 
-                {{-- Field Email --}}
                 <div class="w-full relative mb-1">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fa-regular fa-envelope text-gray-400"></i>
@@ -83,7 +79,6 @@
                            required />
                 </div>
 
-                {{-- ✅ Error per field: email --}}
                 @error('ADMIN_EMAIL')
                     <p class="w-full text-xs text-red-500 mb-3 pl-1 flex items-center gap-1">
                         <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
@@ -92,7 +87,6 @@
                     <div class="mb-4"></div>
                 @enderror
 
-                {{-- Field Password --}}
                 <div class="w-full relative mb-1">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fa-solid fa-lock text-gray-400"></i>
@@ -105,7 +99,6 @@
                            required />
                 </div>
 
-                {{-- ✅ Error per field: password --}}
                 @error('ADMIN_PASSWORD')
                     <p class="w-full text-xs text-red-500 mb-5 pl-1 flex items-center gap-1">
                         <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
@@ -123,7 +116,6 @@
 
     </div>
 
-    {{-- ✅ Shake form jika ada error --}}
     @if ($errors->any() || session('error'))
         <script>
             const form = document.getElementById('loginForm');

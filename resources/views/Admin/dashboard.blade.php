@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Menghilangkan scrollbar tapi tetap bisa di-scroll menyamping */
         .hide-scroll-bar::-webkit-scrollbar {
             display: none;
         }
@@ -19,7 +18,7 @@
 </head>
 <body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
     
-    @include('Admin.navbarAdm')
+    @include('admin.navbarAdm')
     
     <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
         
@@ -33,15 +32,29 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Overview Dashboard</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium mb-1">Total Pengunjung Web</p>
-                        <h3 class="text-4xl font-bold text-gray-800">1,254</h3>
-                        <p class="text-xs text-green-600 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> +14% bulan ini (Dummy)</p>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between overflow-hidden">
+                    
+                    <div class="p-5 flex-1 flex items-center justify-between border-b border-gray-100">
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Total Infaq & Shadaqah</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalInfaq ?? 0, 0, ',', '.') }}</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
                     </div>
-                    <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
-                        <i class="fa-solid fa-eye"></i>
+                    
+                    <div class="p-5 flex-1 flex items-center justify-between bg-gray-50/50">
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Total Penerimaan Zakat</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalZakat ?? 0, 0, ',', '.') }}</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
@@ -56,11 +69,12 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
+
             </div>
 
             <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Update Struktur Organisasi</h3>
-                <form action="#" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row items-start md:items-end gap-4">
+                <form action="{{ route('admin.struktur.update') }}" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row items-start md:items-end gap-4">
                     <div class="w-full md:flex-1">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Upload Gambar Struktur Baru (JPG/PNG)</label>
                         <input type="file" name="struktur_image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 border border-gray-200 rounded-lg p-1 bg-gray-50 cursor-pointer focus:outline-none">

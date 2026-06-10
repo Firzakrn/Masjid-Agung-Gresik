@@ -21,10 +21,9 @@
 
     @include('navbar')
 
-    <!-- ================= 1. HERO SECTION (GAMBAR 1) ================= -->
+    <!-- ================= HEADER ================= -->
     <section class="relative w-full h-[60vh] min-h-[450px] flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <!-- Gambar 1: Suasana damai/masjid -->
             <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Suasana Damai">
             <div class="absolute inset-0 bg-emerald-900/85 mix-blend-multiply"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-slate-50 to-transparent"></div>
@@ -49,7 +48,6 @@
 
         <section class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-stretch">
             
-            <!-- KOLOM TEKS INFAQ & SEDEKAH -->
             <div class="md:col-span-7 flex flex-col gap-8">
                 
                 <!-- BLOK INFAQ -->
@@ -94,14 +92,11 @@
 
             </div>
 
-            <!-- GAMBAR 2 (Samping) -->
             <div class="md:col-span-5 h-full min-h-[400px]">
                 <div class="rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 h-full relative group sticky top-24">
-                    <!-- Gambar 2: Ilustrasi Memberi/Bersedekah -->
                     <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="Memberi Sedekah">
                     <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/20 to-transparent"></div>
                     
-                    <!-- Dekorasi Teks di atas Gambar -->
                     <div class="absolute bottom-0 left-0 p-8 w-full">
                         <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20">
                             <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
@@ -117,9 +112,8 @@
 
         </section>
 
-        <!-- ================= KESIMPULAN & CTA BAWAH (GAMBAR 3) ================= -->
+        <!-- ================= KESIMPULAN & CTA BAWAH ================= -->
         <section class="relative rounded-[3rem] overflow-hidden shadow-2xl mt-10">
-            <!-- Gambar 3: CTA Background -->
             <img src="https://images.unsplash.com/photo-1585036156171-384164a8c675?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover" alt="Interior Masjid">
             <div class="absolute inset-0 bg-emerald-900/90 mix-blend-multiply"></div>
             
@@ -135,7 +129,6 @@
                     <h3 class="text-2xl font-black text-slate-800 mb-2">Salurkan Kebaikan</h3>
                     <p class="text-sm text-slate-500 mb-6">Mari tunaikan Infaq & Sedekah Anda melalui Masjid Agung Gresik untuk kemakmuran umat.</p>
                     
-                    <!-- Tombol Pemicu Modal -->
                     <button @click="openModal()" class="block w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition shadow-lg shadow-emerald-200 text-center flex items-center justify-center gap-2">
                         <i class="fa-solid fa-hand-holding-dollar"></i> Mulai Berbagi
                     </button>
@@ -146,12 +139,9 @@
 
     </main>
 
-    <!-- MANGGIL FILE MODAL ZIS -->
-    @include('Infaq.infaq')
-
+    @include('infaq.infaq')
     @include('footer')
 
-    <!-- SCRIPT ALPINE.JS -->
     <script>
         function zisApp() {
             return {

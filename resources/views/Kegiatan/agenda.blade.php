@@ -29,7 +29,6 @@
             font-weight: bold;
         }
         
-        /* Custom Pagination */
         .swiper-pagination-bullet-active {
             background-color: #16a34a !important; 
             width: 24px !important;
@@ -44,12 +43,11 @@
     
     @include('navbar')
     
-    <!-- HERO SECTION: HIGHLIGHT AGENDA -->
+    <!-- HIGHLIGHT AGENDA -->
     <div class="w-full h-[500px] md:h-[600px] relative group">
         <div class="swiper heroSwiper w-full h-full">
             <div class="swiper-wrapper">
 
-                <!-- PERULANGAN HIGHLIGHT AGENDA -->
                 @foreach($heroAgenda as $item)
                 <div class="swiper-slide relative flex items-end pb-20 md:pb-32 px-4 md:px-20 justify-start text-left overflow-hidden">
                     <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1519817650390-64a93db51149?q=80&w=2000&auto=format&fit=crop' }}" class="absolute inset-0 w-full h-full object-cover" alt="{{ $item->judul }}">
@@ -78,8 +76,7 @@
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-16 w-full overflow-hidden relative -mt-10 z-10">
         
-        <!-- SECTION: JADWAL RUTIN (GRID) -->
-        <!-- Bagian ini aku biarkan statis sesuai kodemu karena sifatnya jadwal tetap -->
+        <!-- SECTION: JADWAL RUTIN -->
         <div class="pt-10 border-t border-slate-200">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-extrabold text-slate-800">Kajian & Majelis Rutin</h2>
@@ -87,7 +84,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Rutinan 1 -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition duration-300">
                     <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-2xl flex-shrink-0">
                         <i class="fa-solid fa-book-open"></i>
@@ -98,7 +94,6 @@
                         <p class="text-sm text-slate-500 mt-1">Ba'da Maghrib | Oleh Ust. Ahmad Humaidi S.Pd.I</p>
                     </div>
                 </div>
-                <!-- Rutinan 2 -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition duration-300">
                     <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl flex-shrink-0">
                         <i class="fa-solid fa-users"></i>
@@ -109,7 +104,6 @@
                         <p class="text-sm text-slate-500 mt-1">Ba'da Sholat Subuh | Terbuka untuk umum</p>
                     </div>
                 </div>
-                <!-- Rutinan 3 -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition duration-300">
                     <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl flex-shrink-0">
                         <i class="fa-solid fa-child-reaching"></i>
@@ -133,16 +127,13 @@
             <div class="swiper posterSwiper w-full !pb-12">
                 <div class="swiper-wrapper">
                     
-                    <!-- PERULANGAN KARTU AGENDA -->
                     @forelse($agendaPosters as $item)
                     <div class="swiper-slide h-auto">
                         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300">
-                            <!-- Image wrapper -->
                             <div class="relative h-64 overflow-hidden"> 
                                 <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=800&auto=format&fit=crop' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $item->judul }}">
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 
-                                <!-- Tanggal Bulan Otomatis dari Carbon -->
                                 @if(!empty($item->waktu_acara))
                                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-center rounded-xl px-3 py-2 shadow-lg border border-white/50">
                                     <p class="text-xs font-bold text-slate-500 uppercase">{{ \Carbon\Carbon::parse($item->waktu_acara)->translatedFormat('M') }}</p>
@@ -151,7 +142,6 @@
                                 @endif
                             </div>
                             
-                            <!-- Content -->
                             <div class="p-6 flex flex-col flex-grow">
                                 @if(!empty($item->waktu_acara))
                                 <div class="flex items-center gap-2 text-sm text-slate-500 mb-3 font-medium"> 
@@ -162,7 +152,6 @@
                                 <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-green-600 transition-colors line-clamp-2">{{ $item->judul }}</h3>
                                 <p class="text-slate-600 text-sm line-clamp-2 mb-6">{{ $item->isi_konten }}</p>
                                 
-                                <!-- Footer Card -->
                                 <a href="{{ route('kegiatan.detail', $item->id) }}" class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-slate-400 group-hover:text-green-600 transition">
                                     <span>Lihat Selengkapnya</span>
                                     <i class="fa-solid fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
@@ -187,7 +176,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // Highlight Slider Setup
         new Swiper(".heroSwiper", {
             loop: true,
             effect: "fade", 
@@ -199,7 +187,6 @@
             navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
         });
 
-        // Poster Slider Setup
         new Swiper(".posterSwiper", {
             slidesPerView: 1,
             spaceBetween: 20,

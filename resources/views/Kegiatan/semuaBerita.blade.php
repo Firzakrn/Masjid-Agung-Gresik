@@ -106,25 +106,20 @@
             const filterBtns = document.querySelectorAll('.filter-btn');
             const newsItems = document.querySelectorAll('.news-item');
             const emptyMessage = document.getElementById('emptyMessage');
-            const defaultFilterBtn = document.getElementById('defaultFilter'); // Ambil tombol Berita
+            const defaultFilterBtn = document.getElementById('defaultFilter'); 
 
-            // Logika saat tombol filter diklik
             function applyFilter(btnElement) {
-                // 1. Reset tampilan semua tombol menjadi putih/abu
                 filterBtns.forEach(b => {
                     b.classList.remove('bg-green-600', 'text-white', 'border-green-600');
                     b.classList.add('bg-white', 'text-gray-600', 'border-gray-100');
                 });
 
-                // 2. Beri warna hijau pada tombol yang sedang aktif
                 btnElement.classList.remove('bg-white', 'text-gray-600', 'border-gray-100');
                 btnElement.classList.add('bg-green-600', 'text-white', 'border-green-600');
 
-                // 3. Ambil kata kunci filter
                 const filterValue = btnElement.getAttribute('data-filter');
                 let countVisible = 0;
 
-                // 4. Proses memunculkan/menyembunyikan
                 newsItems.forEach(item => {
                     const kat = item.getAttribute('data-kat');
                     const sub = item.getAttribute('data-sub');
@@ -146,7 +141,6 @@
                     }
                 });
 
-                // 5. Pesan kosong
                 if (countVisible === 0) {
                     emptyMessage.classList.remove('hidden');
                 } else {
@@ -154,14 +148,12 @@
                 }
             }
 
-            // Pasang event click ke semua tombol
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     applyFilter(this);
                 });
             });
 
-            // Trik Ajaib: Saat halaman pertama dimuat, paksa sistem mengeklik tombol Berita secara otomatis
             if (defaultFilterBtn) {
                 applyFilter(defaultFilterBtn);
             }

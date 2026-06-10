@@ -1,3 +1,5 @@
+
+text/x-generic simulasi.blade.php ( HTML document, ASCII text, with CRLF line terminators )
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,20 +12,18 @@
 <body class="bg-slate-50 min-h-screen flex items-center justify-center">
 
     <div class="bg-white p-10 rounded-3xl shadow-xl text-center max-w-sm w-full border border-slate-100">
-        <!-- Animasi Spinner -->
         <i class="fa-solid fa-circle-notch fa-spin text-5xl text-blue-600 mb-6"></i>
         
         <h2 class="text-xl font-bold text-slate-800 mb-2">Memproses Pembayaran...</h2>
         <p class="text-slate-500 text-sm mb-6">Mohon jangan tutup halaman ini. Mensimulasikan respon dari Midtrans dalam <span id="countdown" class="font-bold text-blue-600 text-lg">15</span> detik.</p>
         
-        <!-- Form Tersembunyi untuk Update Status -->
         <form id="formSimulasi" action="{{ route('simulasi.sukses', $reservasi->id) }}" method="POST">
             @csrf
         </form>
     </div>
 
     <script>
-        let timeLeft = 15; // Waktu tunggu 15 detik
+        let timeLeft = 15; 
         const countdownEl = document.getElementById('countdown');
         const formSimulasi = document.getElementById('formSimulasi');
 
@@ -33,7 +33,6 @@
 
             if (timeLeft <= 0) {
                 clearInterval(timer);
-                // Jika sudah 0 detik, otomatis jalankan form (seolah-olah Midtrans merespon)
                 formSimulasi.submit(); 
             }
         }, 1000);

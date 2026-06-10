@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    {{-- Snap.js Midtrans --}}
     @if(config('midtrans.is_production'))
         <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     @else
@@ -25,7 +24,7 @@
 
     <div class="max-w-6xl mx-auto px-4 py-12">
 
-        {{-- PROGRESS BAR --}}
+        <!-- PROGRESS BAR -->
         <div class="flex items-center justify-center gap-2 md:gap-6 mb-12 overflow-x-auto pb-4">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center"><i class="fa-solid fa-check text-sm"></i></div>
@@ -48,13 +47,11 @@
             </div>
         </div>
 
-        {{-- FORM UTAMA DENGAN ALPINE JS --}}
         <div x-data="pembayaranForm()" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {{-- KOLOM KIRI: FASILITAS & TOMBOL BAYAR --}}
+            <!-- PEMBAYARAN -->
             <div class="lg:col-span-8 space-y-8">
 
-                {{-- BLOK FASILITAS TAMBAHAN --}}
                 <div x-data="{ openFasilitas: false }" class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
                     <button type="button" @click="openFasilitas = !openFasilitas" class="w-full bg-blue-50 hover:bg-blue-100 transition p-6 md:px-10 border-b border-blue-100 flex items-center justify-between focus:outline-none">
                         <div class="flex items-center gap-4 text-left">
@@ -94,14 +91,11 @@
                     </div>
                 </div>
 
-                {{-- BLOK TOMBOL BAYAR MIDTRANS & MANUAL --}}
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10">
-                    
-                    {{-- OPSI 1: MIDTRANS OTOMATIS --}}
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10">                    
+                    <!-- OPSI 1: MIDTRANS OTOMATIS -->
                     <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 1: Pembayaran Otomatis</h2>
                     <p class="text-sm text-slate-500 mb-6">Diproses seketika via Midtrans (Tersedia Transfer Bank, E-Wallet, Kartu Kredit).</p>
 
-                    {{-- Logo metode pembayaran --}}
                     <div class="flex flex-wrap gap-3 mb-6">
                         <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-600">Virtual Account</span>
                         <span class="px-3 py-1 bg-green-100 rounded-lg text-xs font-semibold text-green-700">GoPay</span>
@@ -109,7 +103,6 @@
                         <span class="px-3 py-1 bg-blue-100 rounded-lg text-xs font-semibold text-blue-700">ShopeePay</span>
                     </div>
 
-                    {{-- Alert error --}}
                     <div x-show="errorMsg" x-cloak class="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm" x-text="errorMsg"></div>
 
                     <div class="flex justify-between items-center mb-8">
@@ -117,7 +110,6 @@
                             <i class="fa-solid fa-chevron-left text-xl"></i> Kembali
                         </a>
 
-                        {{-- Tombol Bayar via Midtrans --}}
                         <button
                             type="button"
                             @click="bayarMidtrans()"
@@ -132,24 +124,21 @@
                         </button>
                     </div>
 
-                    {{-- OPSI 2: QRIS STATIS MASJID --}}
+                    <!-- OPSI 2: QRIS / TRANSFER MANUAL -->
                     <div class="pt-8 border-t border-slate-200">
                         <h2 class="text-xl font-bold text-slate-800 mb-2">Opsi 2: Transfer Manual / QRIS Masjid</h2>
                         <p class="text-sm text-slate-500 mb-6">Jika opsi otomatis bermasalah, silakan transfer ke rekening masjid atau scan QRIS di bawah ini.</p>
                         
                         <div class="flex flex-col md:flex-row gap-6 items-center bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                            <!-- GAMBAR QRIS STATIS & TOMBOL DOWNLOAD -->
                             <div class="flex flex-col items-center gap-3">
                                 <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-200">
                                     <img src="{{ asset('images/qris.jpeg') }}" alt="QRIS Masjid Agung Gresik" class="w-40 h-40 object-cover rounded-lg">
                                 </div>
-                                <!-- Tombol Download QRIS -->
                                 <a href="{{ asset('images/qris.jpeg') }}" download="QRIS_Masjid_Agung_Gresik.png" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-full transition flex items-center gap-1">
                                     <i class="fa-solid fa-download"></i> Download QRIS
                                 </a>
                             </div>
                             
-                            <!-- INSTRUKSI MANUAL & TOMBOL WA -->
                             <div class="flex-1 w-full">
                                 <p class="text-sm text-slate-700 font-bold mb-2">Instruksi Pembayaran Manual:</p>
                                 <ul class="list-decimal list-inside text-sm text-slate-600 space-y-1 mb-4">
@@ -159,12 +148,8 @@
                                     <li>Kirim bukti transfer ke WhatsApp Admin.</li>
                                 </ul>
 
-                                <!-- Tombol Konfirmasi WA -->
                                 @php
-                                    // Nomor WA Admin (gunakan kode negara 62 tanpa + atau 0)
-                                    $noWaAdmin = "6281216978686"; 
-                                    
-                                    // Pesan yang sudah di-format otomatis
+                                    $noWaAdmin = "6281216978686";                                     
                                     $pesanWa = "Assalamualaikum Admin,\nSaya ingin konfirmasi pembayaran DP Reservasi.\n\n*Nama:* " . $reservasi->nama_pemohon . "\n*Paket:* " . $reservasi->paket . "\n*Tanggal Acara:* " . $reservasi->tanggal . "\n*Nominal:* Rp " . number_format($dp, 0, ',', '.') . "\n\nBerikut saya lampirkan bukti transfernya.";
                                     $linkWa = "https://wa.me/" . $noWaAdmin . "?text=" . urlencode($pesanWa);
                                 @endphp
@@ -188,7 +173,7 @@
                 </div>
             </div>
 
-            {{-- KOLOM KANAN: STRUK REAL-TIME --}}
+            <!-- STRUK -->
             <div class="lg:col-span-4">
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 sticky top-10 relative overflow-hidden">
                     <h3 class="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Ringkasan Biaya</h3>
@@ -273,7 +258,7 @@
                     }).format(angka);
                 },
 
-                // ─── FUNGSI UTAMA: ambil snap_token → tampilkan popup Midtrans ───
+                // ambil snap_token > tampilkan popup Midtrans 
                 async bayarMidtrans() {
                     this.loading  = true;
                     this.errorMsg = '';
@@ -313,7 +298,6 @@
                                 this.loading  = false;
                             },
                             onClose: () => {
-                                // User menutup popup tanpa bayar
                                 this.loading = false;
                             },
                         });
@@ -326,7 +310,6 @@
             }
         }
 
-        // ─── POLLING status DP (sudah ada di blade lama, dipertahankan) ───
         const reservasiId = {{ $reservasi->id }};
 
         const polling = setInterval(async () => {
@@ -342,10 +325,7 @@
 
         setTimeout(() => clearInterval(polling), 15 * 60 * 1000);
 
-        // ─── FUNGSI UNTUK TUTUP HALAMAN SETELAH KLIK WA ───
         function tutupOtomatis() {
-            // Beri jeda 1.5 detik agar tab WhatsApp sempat terbuka dengan aman
-            // Lalu arahkan halaman ini ke route 'selesai'
             setTimeout(() => {
                 window.location.href = '{{ route("reservasi.selesai", $reservasi->id) }}';
             }, 1500);

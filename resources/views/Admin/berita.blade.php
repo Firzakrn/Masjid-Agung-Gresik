@@ -13,7 +13,7 @@
 </head>
 <body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
 
-    @include('Admin.navbarAdm')
+    @include('admin.navbarAdm')
     <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 relative">
         
         <header class="md:hidden bg-green-900 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -183,7 +183,6 @@
     </main>
 
     <script>
-        // --- LOGIKA FORM TAMBAH ---
         const listView = document.getElementById('listView');
         const formView = document.getElementById('formView');
         const btnTambah = document.getElementById('btnTambah');
@@ -195,12 +194,10 @@
         const inputKategori = document.getElementById('inputKategori');
         const wrapperSubKategori = document.getElementById('wrapperSubKategori');
 
-        // JIKA TOMBOL "TAMBAH BERITA" DIKLIK
         btnTambah.addEventListener('click', () => {
-            document.getElementById('berita_id').value = ''; // Kosongkan ID
-            formPublikasi.reset(); // Bersihkan isi form dari bekas ketikan sebelumnya
+            document.getElementById('berita_id').value = ''; 
+            formPublikasi.reset(); 
             
-            // Kembalikan form ke mode "Tambah"
             formTitle.innerText = 'Tulis Publikasi Baru';
             btnSubmitForm.innerText = 'Simpan Publikasi';
             formPublikasi.action = "{{ route('admin.berita.store') }}"; 
@@ -212,24 +209,20 @@
             formView.classList.remove('hidden');
         });
 
-        // JIKA TOMBOL PENSIL "EDIT" DIKLIK
         const btnEdits = document.querySelectorAll('.btn-edit');
         btnEdits.forEach(btn => {
             btn.addEventListener('click', function() {
-                // 1. Sedot data dari tombol pensil yang diklik (menggunakan data-*)
                 const id = this.getAttribute('data-id');
                 const judul = this.getAttribute('data-judul');
                 const isi = this.getAttribute('data-isi');
                 const kategori = this.getAttribute('data-kategori');
                 const subKategori = this.getAttribute('data-sub');
 
-                // 2. Suntikkan data tersebut ke dalam kotak input form
                 document.getElementById('berita_id').value = id;
                 document.querySelector('input[name="judul"]').value = judul;
                 document.querySelector('textarea[name="isi_konten"]').value = isi;
                 document.getElementById('inputKategori').value = kategori;
 
-                // 3. Atur kemunculan sub-kategori
                 if (kategori === 'kegiatan') {
                     wrapperSubKategori.classList.remove('hidden');
                     const subSelect = wrapperSubKategori.querySelector('select');
@@ -240,10 +233,8 @@
                     wrapperSubKategori.querySelector('select').required = false;
                 }
 
-                // 4. Ubah form ke mode "Edit"
                 formTitle.innerText = 'Edit Publikasi';
                 btnSubmitForm.innerText = 'Update Publikasi';
-                // Ubah tujuan URL agar masuk ke fungsi Update di Controller
                 formPublikasi.action = `/admin/berita/update/${id}`; 
 
                 // 5. Munculkan formnya ke layar
@@ -253,14 +244,12 @@
             });
         });
 
-        // JIKA TOMBOL BATAL DIKLIK
         btnBatalForm.addEventListener('click', () => {
             formView.classList.add('hidden');
             listView.classList.remove('hidden');
             document.getElementById('scrollArea').scrollTop = 0;
         });
 
-        // LOGIKA DROPDOWN SUB-KATEGORI OTOMATIS
         inputKategori.addEventListener('change', function() {
             if (this.value === 'kegiatan') {
                 wrapperSubKategori.classList.remove('hidden');
@@ -272,8 +261,6 @@
             }
         });
 
-
-        // --- LOGIKA MODE HAPUS ---
         const btnToggleHapus = document.getElementById('btnToggleHapus');
         const stickyHapusBar = document.getElementById('stickyHapusBar');
         const btnBatalHapus = document.getElementById('btnBatalHapus');
@@ -294,7 +281,7 @@
                     cb.classList.remove('hidden');
                 } else {
                     cb.classList.add('hidden');
-                    cb.checked = false; // Uncheck semua saat batal
+                    cb.checked = false; 
                 }
             });
             
@@ -310,18 +297,12 @@
             updateHapusCount();
         }
 
-        // Klik tombol "Mode Hapus"
-        btnToggleHapus.addEventListener('click', () => toggleModeHapus(true));
-        
-        // Klik tombol "Batal" di sticky bar
+        btnToggleHapus.addEventListener('click', () => toggleModeHapus(true));        
         btnBatalHapus.addEventListener('click', () => toggleModeHapus(false));
-
-        // Update teks jumlah saat checkbox diklik
         checkboxes.forEach(cb => {
             cb.addEventListener('change', updateHapusCount);
         });
 
-        // Eksekusi Hapus Sungguhan ke Backend
         btnKonfirmasiHapus.addEventListener('click', () => {
             const checkedCount = document.querySelectorAll('.delete-checkbox:checked').length;
             if (checkedCount === 0) {
@@ -329,7 +310,6 @@
                 return;
             }
             if(confirm(`Yakin ingin menghapus ${checkedCount} publikasi secara permanen? Data dan foto yang terhapus tidak dapat dikembalikan.`)) {
-                // Men-submit form penghapusan ke Controller
                 document.getElementById('formHapusData').submit();
             }
         });

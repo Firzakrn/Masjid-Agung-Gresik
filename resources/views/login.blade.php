@@ -32,12 +32,11 @@
     <div class="bg-white rounded-[20px] shadow-2xl relative max-w-4xl w-full flex flex-col-reverse md:flex-row overflow-hidden min-h-[600px]" id="container">
 
         <div class="w-full md:w-1/2 p-8 md:p-12 relative flex items-center justify-center bg-white">
-
-            {{-- ======================== FORM LOGIN ======================== --}}
+            <!-- ======================== FORM LOGIN ======================== -->
             <form action="{{ route('login') }}" method="POST" id="signInForm"
                   class="w-full flex flex-col items-center text-center transition-all duration-300 {{ $errors->hasAny(['USER_EMAIL','USER_PASSWORD']) ? '' : '' }}">
                 @csrf
-                <input type="hidden" name="redirect" value="{{ request('redirect') }}"> {{-- ← tambahkan ini --}}
+                <input type="hidden" name="redirect" value="{{ request('redirect') }}"> 
                 <h1 class="text-3xl font-bold mb-6 text-green-700">Masuk</h1>
 
                 <div class="flex gap-3 mb-5 w-full">
@@ -57,7 +56,6 @@
                     <hr class="flex-grow border-gray-200">
                 </div>
 
-                {{-- ✅ Field Email Login --}}
                 <input type="email" name="USER_EMAIL" id="loginEmail"
                        value="{{ old('USER_EMAIL') }}"
                        placeholder="Email"
@@ -70,7 +68,6 @@
                     </p>
                 @enderror
 
-                {{-- ✅ Field Password Login --}}
                 <input type="password" name="USER_PASSWORD" id="loginPassword"
                        placeholder="Password"
                        class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
@@ -100,13 +97,12 @@
                 </div>
             </form>
 
-            {{-- ======================== FORM REGISTER ======================== --}}
+            <!-- ======================== FORM REGISTER ======================== -->
             <form action="{{ route('register') }}" method="POST" id="signUpForm"
                   class="w-full flex flex-col items-center text-center hidden-form transition-all duration-300">
                 @csrf
                 <h1 class="text-3xl font-bold mb-2 text-green-700">Buat Akun</h1>
                 
-                {{-- Notif dari Google --}}
                 @if(session('show_register'))
                 <div class="w-full bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl text-xs font-semibold mb-4 flex items-center gap-2 slide-down">
                     <i class="fa-brands fa-google text-red-400"></i>
@@ -130,7 +126,6 @@
                     <hr class="flex-grow border-gray-200">
                 </div>
 
-                {{-- ✅ Field Nama --}}
                 <input type="text" name="USER_NAME"
                        value="{{ old('USER_NAME', session('google_name')) }}"
                        placeholder="Username"
@@ -143,7 +138,6 @@
                     </p>
                 @enderror
 
-                {{-- ✅ Field Email Register --}}
                 <input type="email" name="USER_EMAIL"
                     value="{{ old('USER_EMAIL', session('google_email')) }}"
                     placeholder="Email"
@@ -158,7 +152,6 @@
                     @endif
                 @enderror
 
-                {{-- ✅ Field Password Register --}}
                 <input type="password" name="USER_PASSWORD"
                        placeholder="Password"
                        class="w-full bg-white border px-4 py-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition
@@ -170,7 +163,6 @@
                     </p>
                 @enderror
 
-                {{-- ✅ Field Gender --}}
                 <div class="flex justify-center gap-6 w-full mb-5 px-2 py-3 rounded-lg
                             {{ $errors->has('USER_GENDER') ? 'bg-red-50 border border-red-300' : 'bg-gray-50 border border-gray-200' }}">
                     <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-green-700 transition font-medium">
@@ -220,7 +212,6 @@
         </div>
     </div>
 
-    {{-- Modal sukses daftar --}}
     @if(session('cek_email'))
     <div id="emailModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
         <div class="bg-white p-8 rounded-[24px] shadow-2xl max-w-sm w-full text-center">
@@ -242,7 +233,6 @@
         const showSignUpBtn = document.getElementById('showSignUpBtn');
         const showSignInBtn = document.getElementById('showSignInBtn');
 
-        // ✅ Deteksi error: tampilkan form yang sesuai secara otomatis
         const hasLoginError   = {{ $errors->hasAny(['USER_EMAIL', 'USER_PASSWORD']) && old('USER_NAME') === null ? 'true' : 'false' }};
         const hasRegisterError = {{ old('USER_NAME') !== null ? 'true' : 'false' }};
 
@@ -252,7 +242,6 @@
             signInForm.classList.add('hidden-form');
             signUpForm.classList.remove('hidden-form');
         }
-        // ✅ Shake form jika ada error
         @if($errors->any())
             const activeForm = hasRegisterError ? signUpForm : signInForm;
             activeForm.classList.add('shake');

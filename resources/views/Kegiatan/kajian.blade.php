@@ -11,8 +11,7 @@
     
     <style>
         :root {
-            /* Variabel warna hijau untuk Kajian */
-            --hijau-kajian: #059669; /* Emerald 600 */
+            --hijau-kajian: #059669; 
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
@@ -37,7 +36,7 @@
     
     @include('navbar')
 
-    <!-- HERO SECTION KHUSUS KAJIAN -->
+    <!-- HIGHLIGHT KAJIAN -->
     <div class="w-full bg-gradient-to-br from-[#059669] to-emerald-400 py-16 md:py-24 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div class="absolute bottom-0 left-0 w-80 h-80 bg-emerald-900 opacity-20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
@@ -68,7 +67,6 @@
                         <div class="swiper-slide h-auto">
                             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group hover:shadow-xl transition-all duration-300">
                                 
-                                <!-- Image wrapper -->
                                 <div class="relative h-56 overflow-hidden bg-slate-200">
                                     <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?q=80&w=1170&auto=format&fit=crop' }}" 
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -80,7 +78,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Content -->
                                 <div class="p-6 flex flex-col flex-grow">
                                     <div class="flex flex-wrap gap-2 mb-4">
                                         @if($item->waktu_acara)
@@ -136,7 +133,6 @@
                         <div class="swiper-slide h-auto">
                             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col group hover:shadow-xl transition-all duration-300">
                                 
-                                <!-- Image wrapper -->
                                 <div class="relative h-56 overflow-hidden bg-slate-200">
                                     <img src="{{ $item->foto ? asset('images/berita/' . $item->foto) : 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1176&auto=format&fit=crop' }}" 
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -148,7 +144,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Content -->
                                 <div class="p-6 flex flex-col flex-grow">
                                     <div class="flex flex-wrap gap-2 mb-4">
                                         @if($item->waktu_acara)
@@ -196,7 +191,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // Konfigurasi umum untuk Swiper
         const swiperConfig = {
             slidesPerView: 1,
             spaceBetween: 20,
@@ -207,7 +201,6 @@
             }
         };
 
-        // Inisialisasi Swiper Kajian Kitab
         new Swiper(".kitabSwiper", {
             ...swiperConfig,
             pagination: { 
@@ -217,7 +210,6 @@
             }
         });
 
-        // Inisialisasi Swiper Kajian Rutin
         new Swiper(".rutinSwiper", {
             ...swiperConfig,
             pagination: { 
