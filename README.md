@@ -3,6 +3,10 @@
 > **Website ini bersifat non-komersial.**
 > Dilarang keras untuk memperjualbelikan, mengomersialkan, atau mendistribusikan ulang aplikasi ini untuk tujuan keuntungan pribadi atau pihak lain tanpa izin tertulis dari pengembang dan pihak terkait.
 
+| :---: |
+| *Domain Public Website : https://masjidagunggresik.web.id/* |
+| *Tutup pada 16 Juni 2026* |
+
 Website ini berbasis Laravel dan berisi tampilan edukasi, manajemen reservasi sewa gedung, manajemen berita kegiatan, dana ZIS (Zakat, Infaq, Sedekah), pencatatan keuangan masjid. Selain tampilan website ini juga mengandung :
     - CRUD Berita
     - CRUD Transaksi
@@ -107,7 +111,7 @@ Website ini didominasi warna hijau tua atau #15803d sebagai identitas Masjid Agu
 
 ---
 ## Alur Sistem
-![Alur Reservasi dan Keuangan](./alur.svg)
+![Alur Reservasi dan Keuangan](./ss/alur.svg)
 
 ---
 ## Tech Stack
