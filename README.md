@@ -1,66 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Masjid Agung Gresik
+> [!CAUTION]
+> **Website ini bersifat non-komersial.**
+> Dilarang keras untuk memperjualbelikan, mengomersialkan, atau mendistribusikan ulang aplikasi ini untuk tujuan keuntungan pribadi atau pihak lain tanpa izin tertulis dari pengembang dan pihak terkait.
+--- 
+Website ini berbasis Laravel dan berisi tampilan edukasi, manajemen reservasi sewa gedung, manajemen berita kegiatan, dana ZIS (Zakat, Infaq, Sedekah), pencatatan keuangan masjid. Selain tampilan website ini juga mengandung :
+    - CRUD Berita
+    - CRUD Transaksi
+    - CRUD Reservasi
+    
+Harap ikuti langkah-langkah ini untuk menjalankan website!
+## Cara Menjalankan
+1. Clone repository ini
+   ```bash
+   git clone https://github.com/Firzakrn/Masjid-Agung-Gresik.git
+   ```
+2. Masuk ke direktori project
+   ```bash
+   cd Masjid-Agung-Gresik
+   ```
+3. Install dependencies
+   ```bash
+   composer install
+   npm install
+   ```
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+_Jika menggunakan Laragon (disarankan versi 8.0)_
+Pindahkan/letakkan folder project ini ke dalam direktori:
+```
+Laragon > www > Masjid-Agung-Gresik
+```
 
-## About Laravel
+Project ini menggunakan fitur Gmail (SMTP) untuk pengiriman email, Midtrans sebagai payment gateway, dan Google Socialite untuk autentikasi. Sebelum menjalankan project, salin file `.env.example` menjadi `.env` (hapus akhiran `.example`). Dapat langsung copy file pada repository atau menggunakan command berikut pada terminal (pastikan sudah didalam direktori folder website),
+   ```bash
+   cp .env.example .env
+   ```
+lalu sesuaikan konfigurasi beriku sesuai kebutuhant:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Konfigurasi Gmail SMTP** — gunakan App Password Gmail (bukan password akun biasa). Tutorial lengkap: [Cara Mengaktifkan App Password Gmail untuk SMTP Laravel](https://digitalkit.id/blog/cara-konfigurasi-smtp-gmail-di-laravel/)
+- **Konfigurasi Midtrans** — gunakan Server Key & Client Key dari dashboard Midtrans (mode Sandbox untuk development). Tutorial lengkap: [Penjelasan Lengkap Integrasi Midtrans dengan Laravel](https://dev.to/yogameleniawan/penjelasan-lengkap-tentang-fungsi-midtrans-payment-gateway-dan-integrasinya-dengan-laravel-1327)
+- **Konfigurasi Google Socialite** — gunakan Client ID & Client Secret dari Google Cloud Console. Tutorial lengkap: [Tutorial Laravel Login dengan Google Socialite](https://youtu.be/1TvrgUdlzAc?si=x8PVrh6O9f_X3Y82)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Setelah `.env` dikonfigurasi, lanjutkan:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
 
-## Learning Laravel
+## Cara Menyalakan Website pada Localhost 
+_Localhost : komputer lokal sehingga website hanya bisa dibuka pada device yang menjalankan perintah berikut ini. Jika ingin membagikan localhost ikuti langkah-langkah [share](https://laragon.org/docs/quick-share)_
+1. Jalankan Compiler Asset (Frontend):
+   ```Bash
+    npm run dev
+   ```
+    Biarkan terminal ini tetap terbuka.
+2. Jalankan Server Laravel:
+    Buka terminal baru (atau tab baru di terminalmu) dan ketik:
+    ```Bash
+    php artisan serve
+    ```
+_Jika menggunakan Laragon_
+1. Klik Start All
+2. Klik Menu
+3. Pilih www
+4. Pilih Nama Folder Web ini
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Tampilan Website
+Website ini didominasi warna hijau tua atau #15803d sebagai identitas Masjid Agung Gresik serta berbagai warna komplemen lain untuk secara spesifik membedakan tipe pada berita dan kebutuhan kecil lainnya.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Halaman User
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Home**
+![HomeDefault](./ss/home.png) ![HomeAfterLogin](./ss/Home2.jpg)
 
-## Laravel Sponsors
+**Reservasi**
+![Reservasi](./ss/reservasi.png)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**Berita**
+![Berita](./ss/detailberita.png)
 
-### Premium Partners
+**Zakat**
+![Zakat](./ss/zakat.png)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+**Riwayat**
+![Riwayat1](./ss/lacakReservasi.jpg) ![Riwayat2](./ss/lacakZis.jpg)
 
-## Contributing
+### Halaman Admin
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+![Admin](./ss/dashboardAdmin.jpg)
 
-## Code of Conduct
+**Edit Berita**
+![EditBerita](./ss/editBerita.jpg)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Pencatatan**
+![Persetujuan](./ss/accAdmin.jpg)
+![DetailReserver](./ss/reserverAdmin.jpg)
+![LaporanKeuangan](./ss/laporanKeuangan.jpg)
+![RiwayatTransaksi](./ss/riwayat.jpg)
+![KategoriAkunKeuangan](./ss/kategoriAkun.jpg)
+![TambahTransaksi](./ss/tambahTransaksi.jpg)
 
-## Security Vulnerabilities
+### Halaman Authentikasi
+![Login](./ss/login.jpg)
+![LoginAdmin](./ss/loginAdmin.jpg)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
+## Alur Sistem
+![Alur Reservasi dan Keuangan](./alur.svg)
 
-## License
+---
+## Tech Stack
+- **Backend**: Laravel (PHP), Node.js (Build Tools)
+- **Frontend**: Blade, Tailwind CSS, Alpine.js, Font Awesome
+- **Database**: MySQL
+- **Email & Auth**: Gmail SMTP, Laravel Socialite
+- **Payment Gateway**: Midtrans
+- **Tools**: Laragon (phpMyAdmin for Database Management)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Developers Team
+[Kar's](https://github.com/Firzakrn) : Leader dan full-stack developer.
+[Yuri](https://github.com/yuriaja) : Riset additional fitur dan backend developer
