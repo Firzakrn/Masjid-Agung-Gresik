@@ -3,7 +3,6 @@
 > **Website ini bersifat non-komersial.**
 > Dilarang keras untuk memperjualbelikan, mengomersialkan, atau mendistribusikan ulang aplikasi ini untuk tujuan keuntungan pribadi atau pihak lain tanpa izin tertulis dari pengembang dan pihak terkait.
 
-| :---: |
 | *Domain Public Website : https://masjidagunggresik.web.id/* |
 | *Tutup pada 16 Juni 2026* |
 
@@ -124,4 +123,4 @@ Website ini didominasi warna hijau tua atau #15803d sebagai identitas Masjid Agu
 
 ## Developers Team
 [Kar's](https://github.com/Firzakrn) : Leader dan full-stack developer.
-[Yuri](https://github.com/yuriaja) : Riset additional fitur dan backend developer
+[Yuri](https://github.com/yuriaja) : Riset additional feature dan backend developer
