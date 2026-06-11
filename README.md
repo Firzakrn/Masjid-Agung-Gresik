@@ -2,7 +2,7 @@
 > [!CAUTION]
 > **Website ini bersifat non-komersial.**
 > Dilarang keras untuk memperjualbelikan, mengomersialkan, atau mendistribusikan ulang aplikasi ini untuk tujuan keuntungan pribadi atau pihak lain tanpa izin tertulis dari pengembang dan pihak terkait.
---- 
+
 Website ini berbasis Laravel dan berisi tampilan edukasi, manajemen reservasi sewa gedung, manajemen berita kegiatan, dana ZIS (Zakat, Infaq, Sedekah), pencatatan keuangan masjid. Selain tampilan website ini juga mengandung :
     - CRUD Berita
     - CRUD Transaksi
@@ -45,7 +45,6 @@ Setelah `.env` dikonfigurasi, lanjutkan:
 ```bash
 php artisan key:generate
 php artisan migrate
-php artisan serve
 ```
 
 ## Cara Menyalakan Website pada Localhost 
